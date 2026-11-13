@@ -137,7 +137,7 @@
                 </div>
             </div>
 
-            {{-- ====== 4. Pembayaran dan catatan kaki ====== --}}
+            {{-- ====== 4. Pembayaran dan catatan ====== --}}
             <h3 class="set-title">Informasi pembayaran</h3>
             <p class="muted set-hint">Opsional. Kalau diisi, tampil di invoice supaya pelanggan tahu ke mana harus membayar.</p>
 
@@ -158,7 +158,7 @@
             </div>
 
             <div class="field">
-                <label for="footer_note">Catatan kaki (opsional)</label>
+                <label for="footer_note">Catatan (opsional)</label>
                 <input id="footer_note" type="text" name="footer_note" value="{{ $v('footer_note') }}" maxlength="200" placeholder="Contoh: Terima kasih atas kepercayaan Anda.">
             </div>
 

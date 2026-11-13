@@ -509,28 +509,47 @@ input:user-invalid { border-color: var(--danger); }
 
 /* ---------- Tabel ---------- */
 .table-wrap { overflow-x: auto; }
-.table { width: 100%; border-collapse: collapse; }
+.table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 .table th {
     text-align: left;
     font-size: 0.75rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--muted);
-    padding: 10px 12px;
+    padding: 10px 8px;
     border-bottom: 1px solid var(--line);
     white-space: nowrap;
 }
 .table th.num { text-align: right; }
-.table td { padding: 14px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.table td { padding: 14px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
 .table tbody tr { transition: background-color 0.2s ease; }
 .table tbody tr:hover { background: var(--surface-2); }
 .table tbody tr:last-child td { border-bottom: 0; }
 .nowrap, .table td.num { white-space: nowrap; }
+/* Tombol aksi selalu satu baris (Lihat / Unduh PDF / Tandai lunas), posisinya tetap. */
 .actions-cell { white-space: nowrap; }
-.actions { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: nowrap; }
+.actions { display: flex; gap: 6px; align-items: center; justify-content: center; flex-wrap: nowrap; }
+.actions .btn-sm { padding: 6px 10px; font-size: 0.8rem; }
 .table th.actions-col { text-align: center; }
 .actions form { margin: 0; }
 .actions-col { width: 1%; white-space: nowrap; }
+
+@media (max-width: 1100px) { .table th, .table td { padding-left: 6px; padding-right: 6px; } }
+
+/* Kalau halaman diterjemahkan otomatis oleh browser (Chrome Translate), teks tombol jadi lebih
+   panjang. Ukuran dirapatkan sedikit supaya tombol tetap satu baris dan posisinya sama. */
+html.translated-ltr .actions .btn-sm,
+html.translated-rtl .actions .btn-sm,
+html:not([lang="id"]) .actions .btn-sm { padding: 5px 7px; font-size: 0.72rem; }
+html.translated-ltr .actions,
+html.translated-rtl .actions,
+html:not([lang="id"]) .actions { gap: 5px; }
+html.translated-ltr .table .badge,
+html.translated-rtl .table .badge,
+html:not([lang="id"]) .table .badge { font-size: 0.7rem; padding: 3px 8px; }
+html.translated-ltr .table th,
+html.translated-rtl .table th,
+html:not([lang="id"]) .table th { font-size: 0.7rem; letter-spacing: 0.04em; }
 
 .table-plain tbody tr:hover { background: transparent; }
 
