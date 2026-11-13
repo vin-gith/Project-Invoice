@@ -53,7 +53,9 @@
                 <ul class="hero-points reveal" style="--i:4">
                     <li>Nomor invoice otomatis</li>
                     <li>Unduh PDF sekali klik</li>
-                    <li>Mode gelap dan terang</li>
+                    <li>Template invoice</li>
+                    <li>Upload logo</li>
+                    <li>Cetak otomatis</li>
                 </ul>
             </div>
 
