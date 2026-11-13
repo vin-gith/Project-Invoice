@@ -31,7 +31,7 @@
         </nav>
 
         <button type="button" class="theme-switch" id="themeSwitch" role="switch" aria-checked="false" aria-label="Ganti mode tampilan">
-            <span class="theme-label" id="themeLabel">Terang</span>
+            <span class="theme-label" id="themeLabel"><span class="tl-dark">Gelap</span><span class="tl-light">Terang</span></span>
             <span class="theme-track"><span class="theme-knob"></span></span>
         </button>
     </header>
@@ -131,8 +131,8 @@
                     </article>
                     <article class="card feature sr" style="--i:2">
                         <span class="feature-no">06</span>
-                        <h3>Mode gelap dan terang</h3>
-                        <p>Pilih tampilan yang nyaman di mata. Pilihanmu diingat, dan tampilan tidak berkedip saat halaman dibuka.</p>
+                        <h3>Desain invoice sendiri</h3>
+                        <p>Pilih template, font, dan warna, pasang logo usaha di kop dan watermark, lalu unduh atau cetak langsung.</p>
                     </article>
                 </div>
             </div>

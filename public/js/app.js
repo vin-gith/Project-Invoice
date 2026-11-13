@@ -19,12 +19,12 @@
        sudah memasang tema sebelum halaman tampil, jadi tidak berkedip.
        --------------------------------------------------------------- */
     var themeSwitch = document.getElementById('themeSwitch');
-    var themeLabel = document.getElementById('themeLabel');
 
     function paintThemeSwitch() {
         var dark = html.getAttribute('data-theme') === 'dark';
         themeSwitch.setAttribute('aria-checked', dark ? 'true' : 'false');
-        themeLabel.textContent = dark ? 'Gelap' : 'Terang';
+        // Nama mode (Gelap / Terang) ada di HTML dan dipilih lewat CSS, bukan ditulis ulang oleh JS,
+        // supaya terjemahan otomatis browser tidak rusak saat mode diganti.
     }
 
     if (themeSwitch) {

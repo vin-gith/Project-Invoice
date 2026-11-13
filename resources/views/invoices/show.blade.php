@@ -27,14 +27,14 @@
                 <div>
                     <p class="meta-label">Penagih</p>
                     @php $biz = $invoice->seller(); @endphp
-                    <p><strong>{{ $biz->name }}</strong></p>
+                    <p><strong translate="no">{{ $biz->name }}</strong></p>
                     <p class="muted">{{ $biz->address }}</p>
                     <p class="muted">{{ $biz->email }}</p>
                     @if ($biz->phone)<p class="muted">{{ $biz->phone }}</p>@endif
                 </div>
                 <div>
                     <p class="meta-label">Ditagihkan ke</p>
-                    <p><strong>{{ $invoice->customer_name }}</strong></p>
+                    <p><strong translate="no">{{ $invoice->customer_name }}</strong></p>
                     @if ($invoice->customer_address)<p class="muted">{{ $invoice->customer_address }}</p>@endif
                     @if ($invoice->customer_email)<p class="muted">{{ $invoice->customer_email }}</p>@endif
                     @if ($invoice->customer_phone)<p class="muted">{{ $invoice->customer_phone }}</p>@endif

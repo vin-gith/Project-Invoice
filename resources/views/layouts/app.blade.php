@@ -29,7 +29,7 @@
         <a class="brand" href="{{ auth()->check() ? route('invoices.index') : route('home') }}">Invoicely</a>
 
         @auth
-            <span class="user-chip" title="{{ auth()->user()->email }}">{{ auth()->user()->name }}</span>
+            <span class="user-chip" translate="no" title="{{ auth()->user()->email }}">{{ auth()->user()->name }}</span>
             <form method="POST" action="{{ route('logout') }}" class="logout-form">
                 @csrf
                 <button type="submit" class="btn btn-sm btn-ghost">Keluar</button>
@@ -42,7 +42,7 @@
         @endguest
 
         <button type="button" class="theme-switch" id="themeSwitch" role="switch" aria-checked="false" aria-label="Ganti mode tampilan">
-            <span class="theme-label" id="themeLabel">Terang</span>
+            <span class="theme-label" id="themeLabel"><span class="tl-dark">Gelap</span><span class="tl-light">Terang</span></span>
             <span class="theme-track"><span class="theme-knob"></span></span>
         </button>
     </header>
@@ -56,7 +56,7 @@
             <a style="--i:3" href="{{ route('invoices.index', ['status' => 'unpaid']) }}" class="{{ request('status') === 'unpaid' ? 'is-current' : '' }}">Belum lunas</a>
             <a style="--i:4" href="{{ route('invoices.index', ['status' => 'paid']) }}" class="{{ request('status') === 'paid' ? 'is-current' : '' }}">Lunas</a>
             <a style="--i:5" href="{{ route('business.edit') }}" class="{{ request()->routeIs('business.*') ? 'is-current' : '' }}">Data usaha</a>
-            <p class="drawer-foot" style="--i:6">{{ \App\Models\BusinessProfile::current()->name }}</p>
+            <p class="drawer-foot" translate="no" style="--i:6">{{ \App\Models\BusinessProfile::current()->name }}</p>
         </nav>
     @endauth
 
