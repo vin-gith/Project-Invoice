@@ -54,8 +54,8 @@
                     <li>Nomor invoice otomatis</li>
                     <li>Unduh PDF sekali klik</li>
                     <li>Template invoice</li>
-                    <li>Upload logo</li>
-                    <li>Cetak otomatis</li>
+                    <li>Cetak invoice otomatis</li>
+                    <li>Input logo otomatis</li>
                 </ul>
             </div>
 
@@ -189,8 +189,12 @@
         </section>
 
         <footer class="l-wrap l-footer">
-            <span><strong>Invoicely</strong> - Sistem invoice digital</span>
-            <span>&copy; {{ date('Y') }}</span>
+            <span class="l-foot-left"><strong>Invoicely</strong> - Sistem invoice digital</span>
+            <div class="l-contact">
+                <span class="l-contact-title">Hubungi kami</span>
+                <a class="l-contact-mail" href="mailto:Contohxxx@gmail.com" translate="no">Contohxxx@gmail.com</a>
+            </div>
+            <span class="l-foot-right">&copy; {{ date('Y') }}</span>
         </footer>
     </main>
 
@@ -205,6 +209,7 @@
             if (location.hash) { history.replaceState(null, '', location.pathname + location.search); }
             window.scrollTo({ top: 0, behavior: 'instant' });
 
+            // Scroll halus saat klik menu (Contoh invoice, Fitur, Cara kerja): mulai pelan, melaju, lalu berhenti pelan.
             // Kalau pengguna menggulung sendiri di tengah jalan, animasi langsung dihentikan.
             function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
             document.querySelectorAll('a[href^="#"]').forEach(function (a) {

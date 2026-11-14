@@ -29,13 +29,25 @@
 
     if (themeSwitch) {
         paintThemeSwitch();
-        themeSwitch.addEventListener('click', function () {
-            var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            html.classList.add('theme-anim');
+        var applyTheme = function (next) {
             html.setAttribute('data-theme', next);
             try { localStorage.setItem('theme', next); } catch (e) {}
             paintThemeSwitch();
-            setTimeout(function () { html.classList.remove('theme-anim'); }, 450);
+        };
+
+        themeSwitch.addEventListener('click', function () {
+            var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+
+            // Browser yang mendukung View Transitions: pudar halus (ringan, dikerjakan GPU).
+            // Browser lain atau pengguna yang mematikan animasi: ganti langsung tanpa animasi.
+            if (!document.startViewTransition || reduceMotion) {
+                applyTheme(next);
+                return;
+            }
+            html.classList.add('theme-switching');
+            var vt = document.startViewTransition(function () { applyTheme(next); });
+            var done = function () { html.classList.remove('theme-switching'); };
+            vt.finished.then(done, done);
         });
     }
 

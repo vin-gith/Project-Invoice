@@ -52,12 +52,14 @@
     color-scheme: dark;
 }
 
-/* Saat tema diganti, warna berubah halus. Class ini dipasang sebentar oleh JS. */
-html.theme-anim *,
-html.theme-anim *::before,
-html.theme-anim *::after {
-    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease !important;
-}
+/* Ganti tema: browser memotret tampilan lama lalu memudarkannya ke tampilan baru (View Transitions).
+   Ini dikerjakan GPU, jadi tidak patah-patah seperti menganimasikan warna ratusan elemen sekaligus.
+   Selama pergantian, transisi per elemen dimatikan supaya tidak saling tabrakan. Class dipasang oleh JS. */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after { transition: none !important; }
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: 0.3s; animation-timing-function: ease; }
 
 /* ---------- Dasar ---------- */
 * { box-sizing: border-box; }
@@ -773,7 +775,16 @@ html { scroll-behavior: smooth; }
 .cta p { margin: 0 auto 28px; max-width: 460px; color: var(--muted); }
 .cta .hero-cta { justify-content: center; }
 
-.l-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; padding: 26px 0 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.88rem; }
+.l-footer { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px 16px; padding: 26px 0 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.88rem; }
+.l-foot-right { justify-self: end; }
+.l-contact { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+.l-contact-title { color: var(--text); font-weight: 650; }
+.l-contact-mail { color: var(--muted); text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 0 1.5px no-repeat; transition: background-size 0.25s ease, color 0.2s ease; }
+.l-contact-mail:hover { color: var(--text); background-size: 100% 1.5px; }
+@media (max-width: 720px) {
+    .l-footer { grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 14px; }
+    .l-foot-right { justify-self: center; }
+}
 
 @media (max-width: 900px) {
     .hero { padding: 48px 0 64px; }
