@@ -14,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Percayai header dari tunnel (serveo / ngrok). Tanpa ini Laravel mengira halaman
         // diakses lewat http, lalu link CSS dan JS dibuat http dan diblokir browser (mixed content).
         $middleware->trustProxies(at: '*');
+
+        // Pengguna yang SUDAH login lalu membuka /login atau /register (route grup "guest") dulu dilempar ke "/"
+        // (halaman pembuka), jadi tombol Masuk terasa tidak berfungsi. Sekarang langsung ke daftar invoice.
+        $middleware->redirectUsersTo(fn () => route('invoices.index'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

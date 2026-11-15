@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\BusinessProfile;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
-use App\Support\LogoImage;
+use App\Support\InvoicePdf;
 use App\Support\Phone;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
@@ -250,15 +249,8 @@ class InvoiceController extends Controller
 
     private function makePdf(Invoice $invoice)
     {
-        $invoice->load('items');
-        $design = BusinessProfile::design();
-
-        // Logo di kop dan watermark memakai logo milik invoice ini, bukan logo "Data usaha" saat ini.
-        $logoPath = $invoice->sellerLogoPath();
-        $design['logo'] = LogoImage::dataUri($logoPath);
-        $design['watermark'] = LogoImage::watermark($logoPath);
-
-        return Pdf::loadView('invoices.pdf', compact('invoice', 'design'))->setPaper('a4');
+        // Dirakit di InvoicePdf supaya PDF di sini dan pratinjau "Template invoice" selalu sama.
+        return InvoicePdf::make($invoice);
     }
 
     /**

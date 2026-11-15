@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BusinessProfileController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\TemplateInvoiceController;
 use Illuminate\Support\Facades\Route;
 
 // Halaman pembuka untuk semua orang. Yang sudah login juga melihatnya
@@ -36,7 +37,11 @@ Route::middleware('auth')->group(function () {
     Route::get('data-usaha', [BusinessProfileController::class, 'edit'])->name('business.edit');
     Route::put('data-usaha', [BusinessProfileController::class, 'update'])->name('business.update');
     Route::get('data-usaha/logo', [BusinessProfileController::class, 'logo'])->name('business.logo');
-    Route::get('data-usaha/pratinjau', [BusinessProfileController::class, 'preview'])->name('business.preview');
+
+    // Template invoice: tampilan invoice + pratinjau PDF pada invoice yang dipilih (maks 60 pratinjau per menit).
+    Route::get('template-invoice', [TemplateInvoiceController::class, 'edit'])->name('template.edit');
+    Route::put('template-invoice', [TemplateInvoiceController::class, 'update'])->name('template.update');
+    Route::get('template-invoice/pratinjau', [TemplateInvoiceController::class, 'preview'])->middleware('throttle:60,1')->name('template.preview');
 
     Route::get('invoices/suggest', [InvoiceController::class, 'suggest'])->name('invoices.suggest');
     Route::get('invoices/{invoice}/logo', [InvoiceController::class, 'logo'])->name('invoices.logo');

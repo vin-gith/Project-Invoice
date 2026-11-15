@@ -95,13 +95,28 @@ class BusinessProfile extends Model
         return sprintf('#%02x%02x%02x', $mix($r), $mix($g), $mix($b));
     }
 
+    /** Kolom pengaturan tampilan yang boleh dicoba sementara lewat pratinjau (menu Template invoice). */
+    public const DESIGN_FIELDS = [
+        'invoice_title', 'pdf_template', 'pdf_font', 'pdf_color',
+        'bank_name', 'bank_account', 'bank_holder', 'footer_note',
+    ];
+
     /**
      * Semua pengaturan tampilan PDF untuk akun yang sedang login, sudah dalam bentuk siap pakai di template.
      * Nilai kosong atau tidak dikenal otomatis memakai bawaan (Modern, DejaVu Sans, Biru).
+     *
+     * $override: nilai sementara yang menimpa pengaturan tersimpan HANYA untuk pembuatan PDF ini
+     * (tidak ditulis ke database). Dipakai pratinjau supaya template bisa dicoba dulu sebelum disimpan.
      */
-    public static function design(): array
+    public static function design(array $override = []): array
     {
         $p = static::current();
+
+        foreach (self::DESIGN_FIELDS as $field) {
+            if (array_key_exists($field, $override)) {
+                $p->setAttribute($field, $override[$field]);
+            }
+        }
 
         $template = array_key_exists($p->pdf_template, self::TEMPLATES) ? $p->pdf_template : 'modern';
         $font = self::FONTS[$p->pdf_font][1] ?? self::FONTS['sans'][1];
