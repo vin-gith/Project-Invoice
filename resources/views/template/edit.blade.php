@@ -63,7 +63,7 @@
 
                 <div class="field">
                     <label for="invoice_title">Judul invoice</label>
-                    <input id="invoice_title" type="text" name="invoice_title" value="{{ $v('invoice_title', 'INVOICE') }}" required maxlength="30" placeholder="Contoh: INVOICE, FAKTUR, atau NOTA PENJUALAN">
+                    <input id="invoice_title" type="text" name="invoice_title" value="{{ $v('invoice_title', 'INVOICE') }}" required maxlength="30">
                     <small class="field-hint">Tampil sebagai judul besar di invoice dan PDF.</small>
                 </div>
 
@@ -139,22 +139,22 @@
                 <div class="grid-2">
                     <div class="field">
                         <label for="bank_name">Nama bank</label>
-                        <input id="bank_name" type="text" name="bank_name" value="{{ $v('bank_name') }}" maxlength="60" placeholder="Contoh: BCA">
+                        <input id="bank_name" type="text" name="bank_name" value="{{ $v('bank_name') }}" maxlength="60">
                     </div>
                     <div class="field">
                         <label for="bank_account">Nomor rekening</label>
-                        <input id="bank_account" type="text" name="bank_account" value="{{ $v('bank_account') }}" maxlength="40" inputmode="numeric" placeholder="Contoh: 1234567890">
+                        <input id="bank_account" type="text" name="bank_account" value="{{ $v('bank_account') }}" maxlength="40" inputmode="numeric">
                     </div>
                 </div>
 
                 <div class="field">
                     <label for="bank_holder">Atas nama</label>
-                    <input id="bank_holder" type="text" name="bank_holder" value="{{ $v('bank_holder') }}" maxlength="80" placeholder="Contoh: Toko Maju Jaya">
+                    <input id="bank_holder" type="text" name="bank_holder" value="{{ $v('bank_holder') }}" maxlength="80">
                 </div>
 
                 <div class="field">
-                    <label for="footer_note">Catatan kaki (opsional)</label>
-                    <input id="footer_note" type="text" name="footer_note" value="{{ $v('footer_note') }}" maxlength="200" placeholder="Contoh: Terima kasih atas kepercayaan Anda.">
+                    <label for="footer_note">Catatan (opsional)</label>
+                    <input id="footer_note" type="text" name="footer_note" value="{{ $v('footer_note') }}" maxlength="200">
                 </div>
 
                 <div class="set-actions">

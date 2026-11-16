@@ -54,14 +54,14 @@
                     <div class="field">
                         <label for="seller_name">Nama penagih</label>
                         <input id="seller_name" type="text" name="seller_name" required maxlength="120"
-                               placeholder="Contoh: Toko Maju Jaya"
+
                                value="{{ old('seller_name', $seller->name) }}">
                     </div>
 
                     <div class="field">
                         <label for="seller_address">Alamat penagih</label>
                         <input id="seller_address" type="text" name="seller_address" required maxlength="255"
-                               placeholder="Contoh: Jl. Merdeka No. 12, Serang, Banten"
+
                                value="{{ old('seller_address', $seller->address) }}">
                     </div>
 
@@ -69,7 +69,7 @@
                         <div class="field">
                             <label for="seller_email">Email penagih</label>
                             <input id="seller_email" type="email" name="seller_email" required maxlength="120"
-                                   placeholder="Contoh: kontak@tokomajujaya.com"
+
                                    value="{{ old('seller_email', $seller->email) }}">
                         </div>
                         <div class="field">
@@ -90,13 +90,13 @@
                         <div class="field">
                             <label for="customer_name">Nama pelanggan</label>
                             <input id="customer_name" type="text" name="customer_name" required maxlength="120"
-                                   placeholder="Contoh: PT Sumber Makmur"
+
                                    value="{{ old('customer_name', $invoice->customer_name ?? '') }}">
                         </div>
                         <div class="field">
                             <label for="customer_email">Email</label>
                             <input id="customer_email" type="email" name="customer_email" maxlength="120"
-                                   placeholder="Contoh: pembelian@sumbermakmur.co.id"
+
                                    value="{{ old('customer_email', $invoice->customer_email ?? '') }}">
                         </div>
                     </div>
@@ -105,7 +105,7 @@
                         <div class="field">
                             <label for="customer_address">Alamat</label>
                             <input id="customer_address" type="text" name="customer_address" maxlength="255"
-                                   placeholder="Contoh: Jl. Veteran No. 5, Cilegon, Banten"
+
                                    value="{{ old('customer_address', $invoice->customer_address ?? '') }}">
                         </div>
                         <div class="field">
@@ -149,12 +149,12 @@
                         <div>
                             <div class="field">
                                 <label for="tax_percent">Pajak (%)</label>
-                                <input id="tax_percent" type="number" name="tax_percent" min="0" max="100" step="0.01" required placeholder="Contoh: 11"
+                                <input id="tax_percent" type="number" name="tax_percent" min="0" max="100" step="0.01" required
                                        value="{{ old('tax_percent', $invoice->tax_percent ?? 11) }}">
                             </div>
                             <div class="field">
                                 <label for="notes">Catatan (opsional)</label>
-                                <textarea id="notes" name="notes" rows="3" maxlength="500" placeholder="Contoh: Pembayaran paling lambat 7 hari setelah invoice diterima.">{{ old('notes', $invoice->notes ?? '') }}</textarea>
+                                <textarea id="notes" name="notes" rows="3" maxlength="500">{{ old('notes', $invoice->notes ?? '') }}</textarea>
                             </div>
                         </div>
 

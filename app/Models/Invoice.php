@@ -22,25 +22,27 @@ class Invoice extends Model
     }
 
     /**
-     * Nomor invoice otomatis, format INV-DD-MM-YYYY-0001 (contoh: INV-09-11-2026-0001).
-     * Urutan di-reset tiap hari dan dihitung per akun (tiap akun mulai dari 0001). Panggil di dalam DB::transaction
-     * supaya dua invoice yang dibuat bersamaan tidak dapat nomor kembar
-     * (kolom number juga unique sebagai pengaman terakhir).
+     * Nomor invoice otomatis, format INV-DD-MM-YYYY-0001 (contoh: INV-16-11-2026-0005).
+     * Angka urutan di belakang BERLANJUT terus per akun dan tidak di-reset saat ganti hari:
+     * invoice pertama 0001, kedua 0002, ketiga 0003, dan seterusnya. Tanggal di depannya hanya penanda hari pembuatan.
+     * Urutan diambil dari angka terbesar yang sudah ada di akun ini, lalu ditambah 1.
+     * Panggil di dalam DB::transaction: lockForUpdate mengunci baris-baris itu supaya dua invoice yang dibuat
+     * bersamaan tidak dapat nomor kembar (kolom number juga unique per akun sebagai pengaman terakhir).
      */
     public static function nextNumber(int $userId): string
     {
         // Pakai "-" sebagai pemisah, jangan "/", karena nomor ini juga jadi nama file PDF.
         $prefix = 'INV-' . now()->format('d-m-Y') . '-';
 
+        // Ambil angka urutan dari tiap nomor (angka setelah tanda "-" yang terakhir), lalu pilih yang terbesar.
+        // Dibaca lewat regex, bukan 4 karakter terakhir, supaya tetap benar setelah invoice ke-10000.
         $last = static::where('user_id', $userId)
-            ->where('number', 'like', $prefix . '%')
             ->lockForUpdate()
-            ->orderByDesc('number')
-            ->value('number');
+            ->pluck('number')
+            ->map(fn ($number) => preg_match('/-(\d+)$/', (string) $number, $m) ? (int) $m[1] : 0)
+            ->max() ?? 0;
 
-        $sequence = $last ? ((int) substr($last, -4)) + 1 : 1;
-
-        return $prefix . str_pad((string) $sequence, 4, '0', STR_PAD_LEFT);
+        return $prefix . str_pad((string) ($last + 1), 4, '0', STR_PAD_LEFT);
     }
 
     /**

@@ -31,18 +31,18 @@
 
             <div class="field">
                 <label for="name">Nama usaha</label>
-                <input id="name" type="text" name="name" value="{{ old('name', $stored?->name) }}" required maxlength="120" placeholder="Contoh: Toko Maju Jaya">
+                <input id="name" type="text" name="name" value="{{ old('name', $stored?->name) }}" required maxlength="120">
             </div>
 
             <div class="field">
                 <label for="address">Alamat usaha</label>
-                <input id="address" type="text" name="address" value="{{ old('address', $stored?->address) }}" required maxlength="255" placeholder="Contoh: Jl. Merdeka No. 12, Serang, Banten">
+                <input id="address" type="text" name="address" value="{{ old('address', $stored?->address) }}" required maxlength="255">
             </div>
 
             <div class="grid-2">
                 <div class="field">
                     <label for="email">Email usaha</label>
-                    <input id="email" type="email" name="email" value="{{ old('email', $stored?->email) }}" required maxlength="120" placeholder="Contoh: kontak@tokomajujaya.com">
+                    <input id="email" type="email" name="email" value="{{ old('email', $stored?->email) }}" required maxlength="120">
                 </div>
                 <div class="field">
                     <label for="phone">Telepon</label>
