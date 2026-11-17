@@ -654,3 +654,162 @@
     updateRemoveState();
     recalc();
 })();
+
+/* ==========================================================================
+   Tombol bahasa (ID / EN) di topbar.
+   Memakai Google Website Translator, jadi SEMUA teks di halaman ikut diterjemahkan
+   (termasuk teks yang kamu edit sendiri). Cara kerjanya:
+     - Pilihan bahasa disimpan di cookie "googtrans" (/id/en = Inggris, tidak ada = Indonesia).
+     - Skrip Google hanya diunduh kalau bahasa EN sedang aktif. Selama ID, tidak ada
+       skrip pihak ketiga yang dimuat sama sekali.
+     - Tombol dibuat di sini lalu diselipkan di kiri tombol mode, jadi tidak ada file
+       Blade yang perlu diubah (landing juga langsung kebagian).
+   ========================================================================== */
+(function () {
+    'use strict';
+
+    var themeBtn = document.getElementById('themeSwitch');
+    if (!themeBtn || !themeBtn.parentNode) { return; }
+
+    var COOKIE = 'googtrans';
+
+    function currentLang() {
+        var m = document.cookie.match(/(?:^|;\s*)googtrans=([^;]*)/);
+        return m && /\/en$/.test(decodeURIComponent(m[1])) ? 'en' : 'id';
+    }
+
+    // Cookie ditulis untuk host saja dan untuk domain-nya, karena Google bisa membuat salah satunya.
+    function writeCookie(value, remove) {
+        var tail = '; path=/; SameSite=Lax' + (remove ? '; expires=Thu, 01 Jan 1970 00:00:00 GMT' : '');
+        var host = location.hostname;
+        document.cookie = COOKIE + '=' + value + tail;
+        document.cookie = COOKIE + '=' + value + tail + '; domain=' + host;
+        document.cookie = COOKIE + '=' + value + tail + '; domain=.' + host;
+    }
+
+    var lang = currentLang();
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'lang-btn notranslate';
+    btn.setAttribute('translate', 'no');
+    btn.setAttribute('aria-label', lang === 'en' ? 'Ganti bahasa ke Indonesia' : 'Ganti bahasa ke English');
+    btn.title = lang === 'en' ? 'Bahasa Indonesia' : 'English';
+    btn.innerHTML = '<span class="lang-ico" aria-hidden="true"></span><span class="lang-code">' + (lang === 'en' ? 'EN' : 'ID') + '</span>';
+    themeBtn.parentNode.insertBefore(btn, themeBtn);
+
+    btn.addEventListener('click', function () {
+        if (lang === 'en') { writeCookie('/id/id', true); } else { writeCookie('/id/en', false); }
+        location.reload();
+    });
+
+    if (lang !== 'en') { return; }
+
+    // Data milik pengguna (nama pelanggan, nomor, angka) jangan ikut diterjemahkan.
+    var keep = document.querySelectorAll('.brand, .user-chip, .drawer-foot, .stat-value, td[data-label="Nomor"], td[data-label="Pelanggan"], td.num, .tpl-biz');
+    for (var i = 0; i < keep.length; i++) { keep[i].setAttribute('translate', 'no'); }
+
+    var holder = document.createElement('div');
+    holder.id = 'invoicely_gt';
+    holder.setAttribute('translate', 'no');
+    holder.setAttribute('aria-hidden', 'true');
+    holder.style.cssText = 'position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;';
+    document.body.appendChild(holder);
+
+    window.googleTranslateElementInit = function () {
+        new google.translate.TranslateElement({ pageLanguage: 'id', includedLanguages: 'en,id', autoDisplay: false }, 'invoicely_gt');
+    };
+
+    var s = document.createElement('script');
+    s.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    s.async = true;
+    // Offline atau diblokir: tombol diberi tanda, halaman tetap Indonesia dan tetap berfungsi.
+    s.onerror = function () {
+        btn.classList.add('is-error');
+        btn.title = 'Terjemahan tidak bisa dimuat (perlu internet). Klik untuk kembali ke Indonesia.';
+    };
+    document.head.appendChild(s);
+})();
+
+/* ==========================================================================
+   Landing: link navbar yang aktif mengikuti bagian halaman yang sedang dilihat.
+   ========================================================================== */
+(function () {
+    'use strict';
+
+    var links = document.querySelectorAll('.nav-links a[href^="#"]');
+    var items = [];
+    for (var i = 0; i < links.length; i++) {
+        var target = document.getElementById(links[i].getAttribute('href').slice(1));
+        if (target) { items.push({ link: links[i], target: target }); }
+    }
+    if (!items.length) { return; }
+
+    var ticking = false;
+
+    function update() {
+        ticking = false;
+        var line = window.innerHeight * 0.4;
+        var current = null;
+
+        // Bagian terakhir yang bagian atasnya sudah melewati garis 40% layar.
+        for (var j = 0; j < items.length; j++) {
+            if (items[j].target.getBoundingClientRect().top <= line) { current = items[j]; }
+        }
+        // Mentok di dasar halaman: bagian terakhir dianggap aktif.
+        if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) {
+            current = items[items.length - 1];
+        }
+        for (var k = 0; k < items.length; k++) {
+            items[k].link.classList.toggle('is-current', items[k] === current);
+        }
+    }
+
+    function request() {
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }
+
+    window.addEventListener('scroll', request, { passive: true });
+    window.addEventListener('resize', request);
+    update();
+})();
+
+
+/* ==========================================================================
+   Kaca bening di navbar: filter SVG yang membelokkan (refraksi) tulisan di belakangnya.
+   Dipakai lewat CSS: backdrop-filter: url(#glassRefract). Hanya Chromium yang mendukung
+   filter SVG di backdrop-filter, jadi class "refract" dipasang hanya untuk browser itu.
+   ========================================================================== */
+(function () {
+    'use strict';
+
+    var ua = navigator.userAgent;
+    var chromium = /Chrome\//.test(ua) && !/Firefox\//.test(ua);
+    if (!chromium || !window.CSS || !CSS.supports('backdrop-filter', 'url(#glassRefract)')) { return; }
+
+    var ns = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('width', '0');
+    svg.setAttribute('height', '0');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('focusable', 'false');
+    svg.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;';
+
+    // Noise melebar ke samping -> tulisan terpotong-potong dan bergeser seperti terlihat lewat kaca bergelombang.
+    // Tiap warna (merah, hijau, biru) digeser sedikit berbeda, jadi tepinya berpendar seperti kaca sungguhan.
+    svg.innerHTML =
+        '<filter id="glassRefract" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">' +
+        '<feTurbulence type="fractalNoise" baseFrequency="0.006 0.05" numOctaves="2" seed="9" result="noise"/>' +
+        '<feDisplacementMap in="SourceGraphic" in2="noise" scale="34" xChannelSelector="R" yChannelSelector="G" result="dr"/>' +
+        '<feColorMatrix in="dr" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/>' +
+        '<feDisplacementMap in="SourceGraphic" in2="noise" scale="42" xChannelSelector="R" yChannelSelector="G" result="dg"/>' +
+        '<feColorMatrix in="dg" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g"/>' +
+        '<feDisplacementMap in="SourceGraphic" in2="noise" scale="50" xChannelSelector="R" yChannelSelector="G" result="db"/>' +
+        '<feColorMatrix in="db" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b"/>' +
+        '<feBlend in="r" in2="g" mode="screen" result="rg"/>' +
+        '<feBlend in="rg" in2="b" mode="screen"/>' +
+        '</filter>';
+
+    document.body.insertBefore(svg, document.body.firstChild);
+    document.documentElement.classList.add('refract');
+})();

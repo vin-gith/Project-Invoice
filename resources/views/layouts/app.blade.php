@@ -17,6 +17,8 @@
     </script>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     @stack('head')
+    {{-- Tema liquid glass + latar gradasi. Harus paling akhir supaya menimpa app.css dan template.css. --}}
+    <link rel="stylesheet" href="{{ asset('css/glass.css') }}">
 </head>
 <body>
     <header class="topbar">
@@ -63,6 +65,22 @@
     @endauth
 
     <main class="container page">
+        {{-- Masih login tapi membuka halaman Masuk/Daftar: kasih tahu, supaya tidak bingung kenapa terasa "langsung masuk". --}}
+        @auth
+            @if (request()->routeIs('login', 'register'))
+                <div class="alert reveal" role="status" style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px 16px; max-width:520px; margin:0 auto 16px; background:var(--accent-soft); border:1px solid var(--accent); color:var(--text);">
+                    <span>Kamu sedang masuk sebagai <strong translate="no">{{ auth()->user()->name }}</strong>. Masuk atau daftar di bawah akan berpindah akun.</span>
+                    <span style="display:inline-flex; gap:8px;">
+                        <a class="btn btn-sm btn-primary" href="{{ route('invoices.index') }}">Lanjut ke daftar invoice</a>
+                        <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-ghost">Keluar</button>
+                        </form>
+                    </span>
+                </div>
+            @endif
+        @endauth
+
         @yield('content')
     </main>
 

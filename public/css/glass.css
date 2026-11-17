@@ -1,0 +1,622 @@
+/* ==========================================================================
+   Invoicely - tema "liquid glass" dan latar gradasi untuk SEMUA halaman.
+
+   File ini dimuat setelah app.css (dan template.css), jadi tugasnya hanya
+   menimpa warna dan tampilan komponen. Tidak ada class atau HTML yang berubah.
+   Kembali ke tampilan lama: hapus tautan glass.css dari layouts/app.blade.php
+   dan landing.blade.php.
+
+   Resep kacanya (sama untuk semua komponen):
+     1. isi  : putih tembus pandang + kilap di sudut kiri atas   (--glass-fill)
+     2. blur : latar di belakangnya diburamkan dan dipertajam warnanya
+     3. tepi : garis putih tipis + sorot cahaya di dalam sisi atas (--glass-edge, --glass-in)
+     4. bayangan lembut berwarna ungu                             (--shadow)
+   ========================================================================== */
+
+/* ---------- Palet: terang ---------- */
+:root,
+[data-theme="light"] {
+    --bg: #ece4dd;
+    --surface: rgba(255, 255, 255, 0.5);
+    --surface-2: rgba(255, 255, 255, 0.26);
+    --text: #1d1a2e;
+    --muted: #424560;
+    --line: rgba(80, 66, 140, 0.16);
+
+    --accent: #5b46e6;
+    --accent-hover: #4733cf;
+    --accent-contrast: #ffffff;
+    --accent-soft: rgba(91, 70, 230, 0.14);
+    --accent-2: #14a68c;
+
+    --danger: #b3203c;
+    --danger-soft: rgba(224, 54, 79, 0.12);
+    --paid-bg: rgba(48, 200, 160, 0.22);
+    --paid: #0b6b52;
+    --unpaid-bg: rgba(255, 184, 64, 0.28);
+    --unpaid: #84500a;
+    --overdue-bg: rgba(255, 100, 128, 0.22);
+    --overdue: #a31f3b;
+
+    --shadow: 0 10px 34px rgba(96, 76, 180, 0.14), 0 2px 6px rgba(96, 76, 180, 0.07);
+    --shadow-lg: 0 30px 70px rgba(70, 50, 150, 0.26), 0 8px 20px rgba(70, 50, 150, 0.1);
+
+    --glass-fill:
+        radial-gradient(130% 100% at 0% 0%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 55%),
+        linear-gradient(160deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.07));
+    --glass-base: rgba(255, 255, 255, 0.2);
+    --bar-fill: rgba(255, 255, 255, 0.86);
+    --glass-pop: rgba(255, 255, 255, 0.44);
+    --glass-edge: rgba(255, 255, 255, 0.88);
+    --glass-glow: inset 0 -18px 30px -22px rgba(120, 100, 255, 0.45);
+    --glass-in:
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+        inset 1px 0 0 rgba(255, 255, 255, 0.55),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.35),
+        inset -1px 0 0 rgba(255, 255, 255, 0.2);
+    --glass-blur: blur(14px) saturate(190%);
+    --glass-blur-lg: blur(24px) saturate(190%);
+    --glass-blur-bar: blur(24px) saturate(190%);
+
+    --field-bg: rgba(255, 255, 255, 0.4);
+    --field-edge: rgba(255, 255, 255, 0.9);
+    --field-in: inset 0 2px 5px rgba(96, 76, 180, 0.1);
+
+    --btn-grad: linear-gradient(135deg, #7660f0 0%, #4e3ad8 100%);
+    --btn-glow: rgba(91, 70, 230, 0.38);
+    --sheen: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.6) 50%, transparent 62%);
+    --on-solid: #ffffff;
+    --grad-text: linear-gradient(100deg, #5b46e6 0%, #0b8f7a 55%, #d6407a 100%);
+    --band: rgba(255, 255, 255, 0.26);
+
+    /* Latar: dasar berwarna + bulatan warna besar. Dua lapis supaya bisa bergerak berlawanan arah. */
+    --orbs-a:
+        radial-gradient(circle 46vmax at 20% 22%, rgba(140, 118, 255, 0.7), transparent 70%),
+        radial-gradient(circle 42vmax at 80% 80%, rgba(80, 214, 194, 0.6), transparent 70%),
+        linear-gradient(155deg, #f5eee8 0%, #eee5f0 50%, #e5ebf4 100%);
+    --orbs-b:
+        radial-gradient(circle 38vmax at 82% 20%, rgba(255, 158, 190, 0.6), transparent 70%),
+        radial-gradient(circle 36vmax at 18% 80%, rgba(120, 165, 255, 0.5), transparent 70%),
+        radial-gradient(circle 26vmax at 52% 52%, rgba(255, 214, 170, 0.35), transparent 70%);
+}
+
+/* ---------- Palet: gelap ---------- */
+[data-theme="dark"] {
+    --bg: #0b0a16;
+    --surface: rgba(255, 255, 255, 0.1);
+    --surface-2: rgba(255, 255, 255, 0.07);
+    --text: #f1effb;
+    --muted: #aaa8c4;
+    --line: rgba(255, 255, 255, 0.12);
+
+    --accent: #b4a8ff;
+    --accent-hover: #cdc4ff;
+    --accent-contrast: #140e3a;
+    --accent-soft: rgba(180, 168, 255, 0.18);
+    --accent-2: #5fe6c8;
+
+    --danger: #ff9bab;
+    --danger-soft: rgba(255, 120, 140, 0.14);
+    --paid-bg: rgba(70, 220, 175, 0.16);
+    --paid: #7ff0cb;
+    --unpaid-bg: rgba(255, 196, 90, 0.16);
+    --unpaid: #ffd78c;
+    --overdue-bg: rgba(255, 110, 135, 0.16);
+    --overdue: #ffa6b4;
+
+    --shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 30px 80px rgba(0, 0, 0, 0.65);
+
+    --glass-fill:
+        radial-gradient(130% 100% at 0% 0%, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0) 55%),
+        linear-gradient(160deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+    --glass-base: rgba(16, 12, 34, 0.3);
+    --bar-fill: rgba(20, 15, 44, 0.88);
+    --glass-pop: rgba(22, 17, 48, 0.5);
+    --glass-glow: inset 0 -18px 30px -22px rgba(150, 130, 255, 0.38);
+    --glass-edge: rgba(255, 255, 255, 0.17);
+    --glass-in:
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.3),
+        inset 1px 0 0 rgba(255, 255, 255, 0.12),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+    --glass-blur: blur(16px) saturate(180%);
+    --glass-blur-lg: blur(26px) saturate(180%);
+    --glass-blur-bar: blur(26px) saturate(180%);
+
+    --field-bg: rgba(255, 255, 255, 0.05);
+    --field-edge: rgba(255, 255, 255, 0.16);
+    --field-in: inset 0 2px 6px rgba(0, 0, 0, 0.35);
+
+    --btn-grad: linear-gradient(135deg, #cfc6ff 0%, #9382ff 100%);
+    --btn-glow: rgba(147, 130, 255, 0.45);
+    --sheen: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.7) 50%, transparent 62%);
+    --on-solid: #06241b;
+    --grad-text: linear-gradient(100deg, #b4a8ff 0%, #6ff0d0 55%, #ff9ec4 100%);
+    --band: rgba(255, 255, 255, 0.04);
+
+    --orbs-a:
+        radial-gradient(circle 46vmax at 20% 22%, rgba(118, 88, 255, 0.5), transparent 70%),
+        radial-gradient(circle 42vmax at 80% 80%, rgba(24, 196, 176, 0.32), transparent 70%),
+        linear-gradient(155deg, #0c0a18 0%, #110c22 50%, #09101e 100%);
+    --orbs-b:
+        radial-gradient(circle 38vmax at 82% 20%, rgba(255, 80, 170, 0.26), transparent 70%),
+        radial-gradient(circle 36vmax at 18% 80%, rgba(60, 110, 255, 0.34), transparent 70%);
+}
+
+/* ---------- Latar gradasi (semua halaman) ---------- */
+html { background: var(--bg); }
+body { background: transparent; }
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    inset: -22%;
+    z-index: -1;
+    pointer-events: none;
+    will-change: transform;
+}
+body::before { background: var(--orbs-a); animation: glassDriftA 30s ease-in-out infinite alternate; }
+body::after  { background: var(--orbs-b); animation: glassDriftB 38s ease-in-out infinite alternate; }
+/* Hanya transform yang dianimasikan, jadi dikerjakan GPU dan tidak menggambar ulang layar. */
+@keyframes glassDriftA { to { transform: translate3d(4%, 3%, 0) rotate(7deg) scale(1.08); } }
+@keyframes glassDriftB { to { transform: translate3d(-5%, -3%, 0) rotate(-9deg) scale(1.1); } }
+
+::selection { background: var(--accent-soft); }
+
+/* Halaman masuk tanpa memudar: kaca hanya bisa memburamkan latar kalau induknya tidak transparan. */
+@keyframes pageIn {
+    from { transform: translateX(28px); }
+    to   { transform: none; }
+}
+
+/* ---------- Topbar: kapsul kaca melayang ---------- */
+.topbar {
+    top: 10px;
+    width: min(1080px, 100% - 24px);
+    margin: 10px auto 0;
+    padding: 9px 12px 9px 20px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 999px;
+    /* Tanpa blur. Karena itu isinya dibuat lebih pekat (--bar-fill) supaya tulisan di bawahnya
+       yang ikut ter-scroll tidak menembus dan mengganggu tombol di navbar. */
+    background: var(--glass-fill), var(--bar-fill);
+    box-shadow: var(--shadow), var(--glass-in), var(--glass-glow);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+.menu-btn {
+    border: 1px solid var(--field-edge);
+    border-radius: 50%;
+    background: var(--field-bg);
+    box-shadow: var(--glass-in);
+}
+.menu-btn:hover { border-color: var(--accent); }
+
+.theme-track { background: var(--field-bg); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); box-shadow: var(--field-in); }
+.theme-knob { background: var(--btn-grad); box-shadow: 0 2px 8px var(--btn-glow), inset 0 1px 0 rgba(255, 255, 255, 0.6); }
+
+.nav-links a { border-radius: 999px; }
+
+/* ---------- Kartu ---------- */
+.card {
+    border: 1px solid var(--glass-edge);
+    border-radius: 26px;
+    background: var(--glass-fill);
+    box-shadow: var(--shadow), var(--glass-in), var(--glass-glow);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+}
+.demo { box-shadow: var(--shadow-lg), var(--glass-in), var(--glass-glow); }
+.stat:hover,
+.feature:hover,
+.join:hover { box-shadow: var(--shadow-lg), 0 0 0 1px var(--accent-soft), var(--glass-in); }
+
+/* ---------- Tombol: kapsul ---------- */
+.btn { border-radius: 999px; padding: 10px 20px; }
+.btn-sm { border-radius: 999px; padding: 6px 14px; }
+.btn-lg { border-radius: 999px; }
+.actions .btn-sm { padding: 6px 11px; }
+
+/* Utama: gradasi ungu mengilap + kilatan cahaya yang menyapu saat disorot. */
+.btn-primary,
+.btn-primary:hover {
+    background-color: transparent;
+    background-image: var(--sheen), var(--btn-grad);
+    background-repeat: no-repeat;
+    background-size: 260% 100%, 100% 100%;
+    color: var(--accent-contrast);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+.btn-primary {
+    background-position: -160% 0, 0 0;
+    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.55), inset 0 -3px 6px rgba(30, 10, 120, 0.22), 0 10px 24px var(--btn-glow);
+}
+.btn-primary:hover {
+    background-position: 160% 0, 0 0;
+    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.6), inset 0 -3px 6px rgba(30, 10, 120, 0.22), 0 14px 30px var(--btn-glow);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, background-position 0.9s ease;
+}
+
+/* Sekunder: kaca bening. */
+.btn-ghost {
+    background: var(--field-bg);
+    border-color: var(--field-edge);
+    box-shadow: var(--glass-in);
+}
+.btn-ghost:hover { background: var(--surface); border-color: var(--accent); color: var(--accent); }
+
+/* Tandai lunas: kaca hijau tosca. */
+.btn-success {
+    background: var(--paid-bg);
+    color: var(--paid);
+    border-color: color-mix(in srgb, var(--paid) 45%, transparent);
+    box-shadow: var(--glass-in);
+}
+.btn-success:hover { background: var(--paid); color: var(--on-solid); border-color: var(--paid); }
+
+.btn-danger {
+    background: linear-gradient(135deg, #de3a5c 0%, #bd1f3b 100%);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.4), 0 8px 20px rgba(217, 47, 76, 0.35);
+}
+.btn-danger-ghost { background: var(--field-bg); border-color: var(--field-edge); box-shadow: var(--glass-in); }
+
+.badge { border: 1px solid color-mix(in srgb, currentColor 28%, transparent); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+
+/* ---------- Filter (Semua / Belum lunas / Lunas) ---------- */
+.pills {
+    padding: 4px;
+    border: 1px solid var(--field-edge);
+    border-radius: 999px;
+    background: var(--field-bg);
+    box-shadow: var(--field-in);
+}
+.pill { position: relative; border-radius: 999px; }
+.pill.is-active {
+    background: var(--glass-fill), var(--glass-pop);
+    box-shadow: var(--shadow), var(--glass-in);
+}
+.pill.is-active::after {
+    content: "";
+    position: absolute;
+    left: 28%;
+    right: 28%;
+    bottom: 3px;
+    height: 3px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+
+/* ---------- Kolom isian ---------- */
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"], input[type="search"], textarea, select {
+    padding-left: 18px;
+    border: 1px solid var(--field-edge);
+    border-radius: 999px;
+    background: var(--field-bg);
+    box-shadow: var(--field-in);
+}
+textarea { border-radius: 20px; }
+input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+    background: var(--surface);
+    box-shadow: var(--field-in), 0 0 0 4px var(--accent-soft);
+}
+input:user-invalid { border-color: var(--danger); }
+
+.phone-wrap {
+    border: 1px solid var(--field-edge);
+    border-radius: 999px;
+    background: var(--field-bg);
+    box-shadow: var(--field-in);
+}
+.phone-wrap:focus-within { border-color: var(--accent); background: var(--surface); box-shadow: var(--field-in), 0 0 0 4px var(--accent-soft); }
+.phone-prefix { padding-left: 18px; }
+.phone-wrap input[type="text"] { border-radius: 0 999px 999px 0; }
+
+input[type="file"] { border: 1px dashed var(--field-edge); border-radius: 20px; background: var(--field-bg); }
+.alert { border-radius: 18px; }
+
+/* ---------- Form bertahap ---------- */
+.step-no { border: 1.5px solid var(--field-edge); background: var(--field-bg); box-shadow: var(--field-in); }
+.step.is-done .step-no { border-color: var(--accent); }
+.step.is-active .step-no {
+    border-color: transparent;
+    background: var(--btn-grad);
+    color: var(--accent-contrast);
+    box-shadow: 0 6px 16px var(--btn-glow), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.steps-bar { height: 6px; border-radius: 999px; background: var(--field-bg); box-shadow: var(--field-in); }
+.steps-fill { border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+
+.sum-box,
+.paper-totals { border: 1px solid var(--glass-edge); border-radius: 20px; box-shadow: var(--glass-in); }
+
+/* ---------- Menu geser ---------- */
+.scrim { background: rgba(30, 22, 70, 0.32); }
+.drawer-open .scrim { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+
+.drawer {
+    top: 10px;
+    bottom: 10px;
+    left: 10px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 28px;
+    background: var(--glass-fill), var(--glass-pop);
+    box-shadow: var(--shadow-lg), var(--glass-in);
+    -webkit-backdrop-filter: var(--glass-blur-lg);
+    backdrop-filter: var(--glass-blur-lg);
+}
+.drawer a { border-radius: 999px; }
+.drawer a.is-current { box-shadow: var(--glass-in); }
+
+/* ---------- Dropdown saran, modal, toast ---------- */
+.suggest {
+    border: 1px solid var(--glass-edge);
+    border-radius: 22px;
+    background: var(--glass-fill), var(--glass-pop);
+    box-shadow: var(--shadow-lg), var(--glass-in);
+    -webkit-backdrop-filter: var(--glass-blur-lg);
+    backdrop-filter: var(--glass-blur-lg);
+}
+.suggest button { border-radius: 14px; }
+
+.modal-scrim { background: rgba(30, 22, 70, 0.4); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.modal-box {
+    border: 1px solid var(--glass-edge);
+    border-radius: 30px;
+    background: var(--glass-fill), var(--glass-pop);
+    box-shadow: var(--shadow-lg), var(--glass-in);
+    -webkit-backdrop-filter: var(--glass-blur-lg);
+    backdrop-filter: var(--glass-blur-lg);
+}
+
+.toast {
+    border: 1px solid var(--glass-edge);
+    border-radius: 22px;
+    background: var(--glass-fill), var(--glass-pop);
+    color: var(--text);
+    box-shadow: var(--shadow-lg), var(--glass-in);
+    -webkit-backdrop-filter: var(--glass-blur-lg);
+    backdrop-filter: var(--glass-blur-lg);
+}
+
+/* ---------- Halaman Data usaha dan Template invoice ---------- */
+.opt { border: 1.5px solid var(--field-edge); border-radius: 22px; background: var(--field-bg); box-shadow: var(--glass-in); }
+.swatch { border: 1.5px solid var(--field-edge); background: var(--field-bg); box-shadow: var(--glass-in); }
+.logo-preview { border-color: var(--field-edge); border-radius: 18px; }
+
+.tpl-biz { border: 1px solid var(--glass-edge); border-radius: 20px; background: var(--surface-2); box-shadow: var(--glass-in); }
+.tpl-stage { border: 1px solid var(--glass-edge); border-radius: 22px; background: var(--surface-2); box-shadow: var(--glass-in); }
+.tpl-loading { background: var(--glass-pop); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+
+/* ---------- Halaman pembuka ---------- */
+.l-alt { background: linear-gradient(180deg, transparent, var(--band) 18%, var(--band) 82%, transparent); }
+
+.hero h1 .accent {
+    background: var(--grad-text) 0 0 / 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: glassShine 9s ease-in-out infinite alternate;
+}
+@keyframes glassShine { to { background-position: 100% 0; } }
+
+.blob-a { background: color-mix(in srgb, var(--accent) 34%, transparent); }
+.blob-b { background: color-mix(in srgb, var(--accent-2) 30%, transparent); }
+
+.demo-search { border-color: var(--field-edge); border-radius: 999px; background: var(--field-bg); }
+.step-l .num { background: var(--btn-grad); box-shadow: 0 8px 20px var(--btn-glow), inset 0 1.5px 0 rgba(255, 255, 255, 0.5); }
+
+.cta {
+    border: 1px solid var(--glass-edge);
+    border-radius: 34px;
+    background: var(--glass-fill);
+    box-shadow: var(--shadow-lg), var(--glass-in);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+}
+
+/* ---------- Cadangan ---------- */
+/* Browser tanpa backdrop-filter, atau pengguna yang minta transparansi dikurangi:
+   kaca dibuat lebih pekat supaya teks tetap terbaca. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    [data-theme="light"] { --glass-fill: linear-gradient(rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.84)); --glass-base: rgba(255, 255, 255, 0.9); --glass-pop: rgba(255, 255, 255, 0.95); }
+    [data-theme="dark"]  { --glass-fill: linear-gradient(rgba(30, 24, 58, 0.88), rgba(30, 24, 58, 0.88)); --glass-base: rgba(20, 16, 40, 0.92); --glass-pop: rgba(24, 19, 48, 0.96); }
+}
+@media (prefers-reduced-transparency: reduce) {
+    [data-theme="light"] { --glass-fill: linear-gradient(rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.84)); --glass-base: rgba(255, 255, 255, 0.9); --glass-pop: rgba(255, 255, 255, 0.95); }
+    [data-theme="dark"]  { --glass-fill: linear-gradient(rgba(30, 24, 58, 0.88), rgba(30, 24, 58, 0.88)); --glass-base: rgba(20, 16, 40, 0.92); --glass-pop: rgba(24, 19, 48, 0.96); }
+}
+
+/* Pengguna yang mematikan animasi: latar dan teks gradasi diam. */
+@media (prefers-reduced-motion: reduce) {
+    body::before,
+    body::after,
+    .hero h1 .accent { animation: none !important; }
+}
+
+/* HP: blur dikurangi sedikit supaya tetap ringan. */
+@media (max-width: 720px) {
+    :root, [data-theme="light"], [data-theme="dark"] { --glass-blur: blur(12px) saturate(170%); --glass-blur-lg: blur(20px) saturate(170%); --glass-blur-bar: blur(18px) saturate(170%); }
+    .topbar { width: calc(100% - 20px); padding-left: 16px; }
+}
+
+
+/* ==========================================================================
+   Tombol ikon di topbar: bahasa (globe + ID/EN) dan mode (matahari/bulan).
+   Ikon digambar dengan CSS (mask) jadi HTML tidak perlu diubah.
+   Tombol bahasa dibuat oleh app.js, tepat di sebelah kiri tombol mode.
+   ========================================================================== */
+.menu-btn,
+.lang-btn,
+.theme-switch { flex: none; }
+.lang-btn,
+.theme-switch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    min-width: 40px;
+    padding: 0;
+    border: 1px solid var(--field-edge);
+    border-radius: 14px;
+    background: var(--field-bg);
+    box-shadow: var(--glass-in);
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.25s ease;
+}
+.lang-btn:hover,
+.theme-switch:hover { border-color: var(--accent); background: var(--surface); transform: translateY(-2px); box-shadow: var(--glass-in), 0 8px 18px var(--accent-soft); }
+.lang-btn:active,
+.theme-switch:active { transform: scale(0.93); }
+
+/* Tulisan "Gelap/Terang" dan jalur geser lama disembunyikan; ikon yang menggantikan. */
+.theme-switch .theme-label,
+.theme-switch .theme-track { display: none !important; }
+
+.theme-switch::before,
+.lang-ico {
+    content: "";
+    display: block;
+    width: 20px;
+    height: 20px;
+    background: currentColor;
+    -webkit-mask: var(--ico) center / contain no-repeat;
+    mask: var(--ico) center / contain no-repeat;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.theme-switch:hover::before { transform: rotate(35deg) scale(1.08); }
+.lang-btn:hover .lang-ico { transform: rotate(-20deg) scale(1.08); }
+
+/* Terang: bulan (klik untuk gelap). Gelap: matahari kuning (klik untuk terang). */
+.theme-switch {
+    --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z'/%3E%3C/svg%3E");
+    color: var(--accent);
+}
+[data-theme="dark"] .theme-switch {
+    --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2.5v2.2M12 19.3v2.2M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6'/%3E%3C/svg%3E");
+    color: #ffc857;
+}
+
+.lang-btn {
+    gap: 8px;
+    padding: 0 14px 0 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.86rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M3 12h18M12 3c3.2 3.2 3.2 14.8 0 18M12 3c-3.2 3.2-3.2 14.8 0 18'/%3E%3C/svg%3E");
+}
+.lang-ico { flex: none; width: 18px; height: 18px; color: var(--accent-2); }
+.lang-btn.is-error { border-color: var(--danger); }
+
+@media (max-width: 720px) {
+    .lang-btn { padding: 0 11px 0 9px; }
+}
+
+/* ---------- Daftar pilihan (select) terbaca di mode gelap ---------- */
+/* Daftar pilihan digambar browser dengan latar putih sendiri. Warna dipasang eksplisit
+   supaya teks terang di mode gelap tidak "hilang" di atas latar putih. */
+select option,
+select optgroup { background-color: #ffffff; color: #1d1a2e; }
+[data-theme="dark"] select option,
+[data-theme="dark"] select optgroup { background-color: #1a1530; color: #f1effb; }
+
+/* ---------- Terjemahan Google: sembunyikan banner dan sorotannya ---------- */
+body { top: 0 !important; }
+.skiptranslate iframe,
+iframe.goog-te-banner-frame,
+.goog-te-balloon-frame,
+#goog-gt-tt,
+.goog-tooltip { display: none !important; visibility: hidden !important; }
+.goog-text-highlight { background: none !important; box-shadow: none !important; }
+
+/* HP kecil: topbar dirapatkan supaya semua tombol muat dalam satu baris. */
+.nav-links a { white-space: nowrap; }
+@media (max-width: 480px) {
+    .topbar { gap: 8px; padding: 8px 10px 8px 14px; }
+    .menu-btn { width: 38px; height: 38px; }
+    .lang-btn, .theme-switch { height: 38px; min-width: 38px; }
+    .lang-btn { padding: 0 10px 0 8px; gap: 6px; }
+    .nav-links { margin-right: 0; }
+    .nav-links a { padding: 8px; }
+}
+
+/* ==========================================================================
+   Navbar panjang dengan kaca bening yang membelokkan tulisan di belakangnya
+   (refraksi), bukan memburamkannya.
+
+   Filter SVG "glassRefract" dipasang oleh app.js. Hanya browser berbasis Chromium
+   (Chrome, Edge, Opera) yang bisa memakai filter SVG di backdrop-filter; app.js menambahkan
+   class "refract" di <html> kalau browsernya cocok. Browser lain tetap memakai isi navbar
+   yang lebih pekat (aturan topbar di atas), jadi tulisan di bawahnya tidak mengganggu.
+   ========================================================================== */
+.topbar {
+    width: min(1080px, 100% - 24px);
+    max-width: none;
+    margin: 10px auto 0;
+    padding: 9px 12px 9px 20px;
+    gap: 10px;
+}
+.topbar .brand { margin: 0 auto 0 0; padding: 0; font-size: 1.2rem; }
+
+.nav-links { gap: 2px; margin: 0 4px 0 0; padding-left: 0; border-left: 0; }
+.nav-links a { padding: 9px 14px; border: 1px solid transparent; color: var(--muted); }
+.nav-links a:hover { color: var(--text); background: var(--surface-2); }
+.nav-links a.is-current {
+    color: var(--text);
+    border-color: var(--field-edge);
+    background: var(--field-bg);
+    box-shadow: var(--glass-in);
+}
+.nav-links a.nav-cta,
+.nav-links a.nav-cta.is-current { color: var(--accent); }
+
+.topbar .user-chip { margin: 0; padding: 0; border: 0; }
+.topbar .lang-btn { position: relative; margin-left: 8px; }
+.topbar .lang-btn::before {
+    content: "";
+    position: absolute;
+    left: -7px;
+    top: 50%;
+    width: 1px;
+    height: 22px;
+    background: var(--line);
+    transform: translateY(-50%);
+}
+
+/* Kaca bening: hampir tanpa isi warna, tulisan di belakangnya dibelokkan oleh filter. */
+[data-theme="light"] { --bar-clear: radial-gradient(120% 160% at 0% 0%, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 60%), rgba(255, 255, 255, 0.3); --bar-tune: brightness(1.18) contrast(0.8); }
+[data-theme="dark"]  { --bar-clear: radial-gradient(120% 160% at 0% 0%, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 60%), rgba(12, 9, 30, 0.3); --bar-tune: brightness(0.72); }
+
+html.refract .topbar {
+    background: var(--bar-clear);
+    -webkit-backdrop-filter: url(#glassRefract) var(--bar-tune);
+    backdrop-filter: url(#glassRefract) var(--bar-tune);
+}
+
+@media (max-width: 720px) {
+    .topbar { width: calc(100% - 20px); padding-left: 16px; }
+}
+@media (max-width: 480px) {
+    .topbar { gap: 8px; padding: 8px 10px 8px 14px; }
+    .topbar .brand { padding: 0; }
+    .nav-links { margin-right: 0; }
+    .nav-links a { padding: 8px; }
+    .topbar .lang-btn { margin-left: 4px; }
+}
+
+/* Tulisan di navbar tetap jelas waktu ada tulisan lain lewat di belakang kaca bening:
+   link dibuat penuh kontras dan sedikit lebih tebal, plus bayangan tipis di sekelilingnya. */
+[data-theme="light"] { --bar-text: 0 0 10px rgba(255, 255, 255, 0.9), 0 0 2px rgba(255, 255, 255, 0.8); }
+[data-theme="dark"]  { --bar-text: 0 1px 10px rgba(0, 0, 0, 0.85), 0 0 2px rgba(0, 0, 0, 0.6); }
+.topbar { text-shadow: var(--bar-text); }
+.topbar .nav-links a { color: var(--text); font-weight: 700; }
+.topbar .nav-links a.nav-cta,
+.topbar .nav-links a.nav-cta.is-current { color: var(--accent); }
+.topbar .user-chip { color: var(--text); }
