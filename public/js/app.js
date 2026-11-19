@@ -774,42 +774,109 @@
     update();
 })();
 
-
 /* ==========================================================================
-   Kaca bening di navbar: filter SVG yang membelokkan (refraksi) tulisan di belakangnya.
-   Dipakai lewat CSS: backdrop-filter: url(#glassRefract). Hanya Chromium yang mendukung
-   filter SVG di backdrop-filter, jadi class "refract" dipasang hanya untuk browser itu.
+   Kaca bening di navbar, gaya "GlassSurface" (komponen yang dipakai navbar contoh).
+   Navbar memakai backdrop-filter: url(#invoicely-glass-bar). Cara kerjanya:
+     1. Dibuat sebuah "peta" gambar seukuran navbar: gradasi merah dan biru di tepi, abu-abu di tengah.
+     2. feDisplacementMap menggeser gambar di belakang navbar menurut peta itu. Abu-abu = tidak bergeser,
+        jadi tengah navbar jernih dan tepinya membelokkan cahaya seperti lensa.
+     3. Merah, hijau, biru digeser sedikit berbeda (offset), jadi tepinya berpendar tipis.
+   Peta dibuat ulang setiap ukuran navbar berubah. Hanya Chromium (Chrome, Edge, Opera) yang bisa
+   memakai filter SVG di backdrop-filter; browser lain mengabaikan ini dan memakai isi navbar yang pekat.
    ========================================================================== */
 (function () {
     'use strict';
 
+    var bar = document.querySelector('.topbar');
     var ua = navigator.userAgent;
     var chromium = /Chrome\//.test(ua) && !/Firefox\//.test(ua);
-    if (!chromium || !window.CSS || !CSS.supports('backdrop-filter', 'url(#glassRefract)')) { return; }
+    if (!bar || !chromium || !window.CSS || !CSS.supports('backdrop-filter', 'url(#x)')) { return; }
 
-    var ns = 'http://www.w3.org/2000/svg';
-    var svg = document.createElementNS(ns, 'svg');
+    // Atur tampilan kaca di sini. Semua angka bisa diubah lalu Ctrl+F5.
+    var GLASS = {
+        // Angka di bawah disalin dari filter SVG navbar contoh (alfari.my.id) lewat DevTools.
+        distortionScale: -66,   // KEKUATAN BELOKAN. Makin besar angkanya (mis. -100) makin melengkung; 0 = efek mati
+        redOffset: -4,          // selisih belokan tiap warna = pinggiran warna tipis di tepi huruf.
+        greenOffset: 0,         // Skala akhir tiap warna: merah -70, hijau -66, biru -62. Semua 0 = tanpa pinggiran warna
+        blueOffset: 4,
+        borderWidth: 0.07,      // lebar tepi yang membelokkan (0 sampai 0.5)
+        brightness: 50,         // 50 = tengah netral. Jangan diubah kecuali paham
+        opacity: 0.93,
+        blur: 14,               // kehalusan peralihan tepi ke tengah. Makin besar, makin lembut belokannya
+        displace: 0.25,         // blur sangat ringan pada hasil akhir (0 = tajam)
+        borderRadius: 999,      // sama seperti contoh. Tidak perlu diubah
+        mixBlendMode: 'difference'
+    };
+
+    var NS = 'http://www.w3.org/2000/svg';
+
+    function matrix(r, g, b) {
+        return [r, 0, 0, 0, 0, 0, g, 0, 0, 0, 0, 0, b, 0, 0, 0, 0, 0, 1, 0].join(' ');
+    }
+
+    var svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('width', '0');
     svg.setAttribute('height', '0');
     svg.setAttribute('aria-hidden', 'true');
     svg.setAttribute('focusable', 'false');
-    svg.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;';
-
-    // Noise melebar ke samping -> tulisan terpotong-potong dan bergeser seperti terlihat lewat kaca bergelombang.
-    // Tiap warna (merah, hijau, biru) digeser sedikit berbeda, jadi tepinya berpendar seperti kaca sungguhan.
+    svg.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;pointer-events:none;';
     svg.innerHTML =
-        '<filter id="glassRefract" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">' +
-        '<feTurbulence type="fractalNoise" baseFrequency="0.006 0.05" numOctaves="2" seed="9" result="noise"/>' +
-        '<feDisplacementMap in="SourceGraphic" in2="noise" scale="34" xChannelSelector="R" yChannelSelector="G" result="dr"/>' +
-        '<feColorMatrix in="dr" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="r"/>' +
-        '<feDisplacementMap in="SourceGraphic" in2="noise" scale="42" xChannelSelector="R" yChannelSelector="G" result="dg"/>' +
-        '<feColorMatrix in="dg" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="g"/>' +
-        '<feDisplacementMap in="SourceGraphic" in2="noise" scale="50" xChannelSelector="R" yChannelSelector="G" result="db"/>' +
-        '<feColorMatrix in="db" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="b"/>' +
-        '<feBlend in="r" in2="g" mode="screen" result="rg"/>' +
-        '<feBlend in="rg" in2="b" mode="screen"/>' +
-        '</filter>';
-
+        '<defs><filter id="invoicely-glass-bar" color-interpolation-filters="sRGB" x="0%" y="0%" width="100%" height="100%">' +
+        '<feImage x="0" y="0" width="100%" height="100%" preserveAspectRatio="none" result="map"/>' +
+        '<feDisplacementMap in="SourceGraphic" in2="map" id="igR" result="dispRed" xChannelSelector="R" yChannelSelector="G"/>' +
+        '<feColorMatrix in="dispRed" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>' +
+        '<feDisplacementMap in="SourceGraphic" in2="map" id="igG" result="dispGreen" xChannelSelector="R" yChannelSelector="G"/>' +
+        '<feColorMatrix in="dispGreen" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/>' +
+        '<feDisplacementMap in="SourceGraphic" in2="map" id="igB" result="dispBlue" xChannelSelector="R" yChannelSelector="G"/>' +
+        '<feColorMatrix in="dispBlue" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/>' +
+        '<feBlend in="red" in2="green" mode="screen" result="rg"/>' +
+        '<feBlend in="rg" in2="blue" mode="screen" result="output"/>' +
+        '<feGaussianBlur in="output" stdDeviation="' + GLASS.displace + '"/>' +
+        '</filter></defs>';
     document.body.insertBefore(svg, document.body.firstChild);
+
+    var image = svg.querySelector('feImage');
+    svg.querySelector('#igR').setAttribute('scale', GLASS.distortionScale + GLASS.redOffset);
+    svg.querySelector('#igG').setAttribute('scale', GLASS.distortionScale + GLASS.greenOffset);
+    svg.querySelector('#igB').setAttribute('scale', GLASS.distortionScale + GLASS.blueOffset);
+
+    // Peta gambar: merah (kiri-kanan) dan biru (atas-bawah) di tepi, abu-abu kabur di tengah.
+    // Markup-nya sama persis dengan yang dibuat komponen contoh.
+    function drawMap() {
+        var rect = bar.getBoundingClientRect();
+        var w = rect.width || 400;
+        var h = rect.height || 60;
+        var edge = Math.min(w, h) * (GLASS.borderWidth * 0.5);
+        var rx = GLASS.borderRadius;
+        var map =
+            '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg"><defs>' +
+            '<linearGradient id="red-grad" x1="100%" y1="0%" x2="0%" y2="0%"><stop offset="0%" stop-color="#0000"/><stop offset="100%" stop-color="red"/></linearGradient>' +
+            '<linearGradient id="blue-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#0000"/><stop offset="100%" stop-color="blue"/></linearGradient>' +
+            '<filter id="soft" filterUnits="userSpaceOnUse" x="0" y="0" width="' + w + '" height="' + h + '" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="' + GLASS.blur + '"/></filter>' +
+            '</defs>' +
+            '<rect x="0" y="0" width="' + w + '" height="' + h + '" fill="black"/>' +
+            '<rect x="0" y="0" width="' + w + '" height="' + h + '" rx="' + rx + '" fill="url(#red-grad)"/>' +
+            '<rect x="0" y="0" width="' + w + '" height="' + h + '" rx="' + rx + '" fill="url(#blue-grad)" style="mix-blend-mode: ' + GLASS.mixBlendMode + '"/>' +
+            '<rect x="' + edge + '" y="' + edge + '" width="' + (w - edge * 2) + '" height="' + (h - edge * 2) + '" rx="' + rx + '" fill="hsl(0 0% ' + GLASS.brightness + '% / ' + GLASS.opacity + ')" filter="url(#soft)"/>' +
+            '</svg>';
+        // Ukuran feImage HARUS berupa angka piksel. Kalau ditulis "100%", persennya dihitung terhadap <svg>
+        // pembungkus yang berukuran 0x0, jadi petanya tidak terbaca dan efek lensanya hilang.
+        image.setAttribute('width', w);
+        image.setAttribute('height', h);
+        image.setAttribute('href', 'data:image/svg+xml,' + encodeURIComponent(map));
+    }
+
+    drawMap();
     document.documentElement.classList.add('refract');
+
+    if ('ResizeObserver' in window) {
+        var last = '';
+        new ResizeObserver(function () {
+            var r = bar.getBoundingClientRect();
+            var key = Math.round(r.width) + 'x' + Math.round(r.height);
+            if (key !== last) { last = key; drawMap(); }
+        }).observe(bar);
+    } else {
+        window.addEventListener('resize', drawMap);
+    }
 })();

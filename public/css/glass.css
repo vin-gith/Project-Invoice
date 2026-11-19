@@ -551,7 +551,7 @@ iframe.goog-te-banner-frame,
    Navbar panjang dengan kaca bening yang membelokkan tulisan di belakangnya
    (refraksi), bukan memburamkannya.
 
-   Filter SVG "glassRefract" dipasang oleh app.js. Hanya browser berbasis Chromium
+   Filter SVG "invoicely-glass-bar" dipasang oleh app.js. Hanya browser berbasis Chromium
    (Chrome, Edge, Opera) yang bisa memakai filter SVG di backdrop-filter; app.js menambahkan
    class "refract" di <html> kalau browsernya cocok. Browser lain tetap memakai isi navbar
    yang lebih pekat (aturan topbar di atas), jadi tulisan di bawahnya tidak mengganggu.
@@ -590,14 +590,34 @@ iframe.goog-te-banner-frame,
     transform: translateY(-50%);
 }
 
-/* Kaca bening: hampir tanpa isi warna, tulisan di belakangnya dibelokkan oleh filter. */
-[data-theme="light"] { --bar-clear: radial-gradient(120% 160% at 0% 0%, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 60%), rgba(255, 255, 255, 0.3); --bar-tune: brightness(1.18) contrast(0.8); }
-[data-theme="dark"]  { --bar-clear: radial-gradient(120% 160% at 0% 0%, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 60%), rgba(12, 9, 30, 0.3); --bar-tune: brightness(0.72); }
-
+/* Kaca bening gaya "GlassSurface" (sama dengan navbar contoh). Aktif hanya kalau app.js
+   memasang class "refract" (Chrome, Edge, Opera). Browser lain memakai isi navbar yang lebih pekat.
+   Ubah --glass-frost (tebal warna isi, 0 = bening penuh) dan --glass-saturation (kepekatan warna)
+   di sini. Kekuatan belokan ada di app.js (GLASS.distortionScale). */
 html.refract .topbar {
-    background: var(--bar-clear);
-    -webkit-backdrop-filter: url(#glassRefract) var(--bar-tune);
-    backdrop-filter: url(#glassRefract) var(--bar-tune);
+    --filter-id: url(#invoicely-glass-bar);
+    --glass-saturation: 1;
+    border-color: transparent;
+    -webkit-backdrop-filter: var(--filter-id) saturate(var(--glass-saturation));
+    backdrop-filter: var(--filter-id) saturate(var(--glass-saturation));
+}
+html.refract[data-theme="dark"] .topbar {
+    --glass-frost: 0.08;
+    background: hsl(0 0% 0% / var(--glass-frost));
+    box-shadow:
+        0 0 2px 1px color-mix(in oklch, white, transparent 65%) inset,
+        0 0 10px 4px color-mix(in oklch, white, transparent 85%) inset,
+        0 4px 16px rgba(17, 17, 26, 0.05),
+        0 8px 32px rgba(17, 17, 26, 0.05);
+}
+html.refract[data-theme="light"] .topbar {
+    --glass-frost: 0.3;
+    background: hsl(0 0% 100% / var(--glass-frost));
+    box-shadow:
+        0 0 2px 1px color-mix(in oklch, black, transparent 85%) inset,
+        0 0 10px 4px color-mix(in oklch, black, transparent 90%) inset,
+        0 4px 16px rgba(17, 17, 26, 0.05),
+        0 8px 32px rgba(17, 17, 26, 0.05);
 }
 
 @media (max-width: 720px) {
