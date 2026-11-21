@@ -265,10 +265,10 @@ body.leaving .page { animation: pageOut 0.22s ease-in forwards; }
 }
 
 .drawer-title {
-    font-size: 0.75rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--muted);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: normal;
+    text-transform: none;
     margin: 4px 12px 12px;
 }
 .drawer a {

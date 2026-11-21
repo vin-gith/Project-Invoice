@@ -17,9 +17,9 @@ class BusinessProfile extends Model
 
     /** Pilihan template PDF: kode => [nama, keterangan]. */
     public const TEMPLATES = [
-        'Modern' => ['Modern', 'Judul berwarna, tabel dengan header berwarna.'],
-        'klasik' => ['Klasik', 'Kop surat di tengah, tabel bergaris penuh, ada kolom tanda tangan.'],
-        'Minimalist' => ['Minimalist', 'Bersih dan lega, garis tipis, tanpa blok warna besar.'],
+        'modern' => ['Modern', 'Judul berwarna, tabal dengan header berwarna.'],
+        'klasik' => ['Klasik', 'Kop surat di tengah, tabal bergaris penuh, ada kolom tanda tangan.'],
+        'minimal' => ['Minimalist', 'Bersih dan lega, garis tipis, tanpa blok warna besar.'],
     ];
 
     /** Pilihan font PDF: kode => [nama, font-family untuk PDF, font-family untuk contoh di layar]. */

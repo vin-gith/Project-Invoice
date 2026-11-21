@@ -218,11 +218,19 @@ class InvoiceController extends Controller
         );
     }
 
-    public function pdf(Invoice $invoice)
+    public function pdf(Request $request, Invoice $invoice)
     {
         $this->authorizeOwner($invoice);
 
-        return $this->makePdf($invoice)->download($invoice->number . '.pdf');
+        // ?template=kode dikirim dari kotak "Pilih template PDF". Hanya berlaku untuk unduhan ini (tidak disimpan),
+        // dan kode yang tidak dikenal diabaikan sehingga jatuh ke template yang tersimpan di menu "Template invoice".
+        $override = [];
+        $template = $request->query('template');
+        if (is_string($template) && array_key_exists($template, BusinessProfile::TEMPLATES)) {
+            $override['pdf_template'] = $template;
+        }
+
+        return $this->makePdf($invoice, $override)->download($invoice->number . '.pdf');
     }
 
     /**
@@ -247,12 +255,12 @@ class InvoiceController extends Controller
         return Storage::disk('local')->response($path);
     }
 
-    private function makePdf(Invoice $invoice)
+    private function makePdf(Invoice $invoice, array $override = [])
     {
         // Dirakit di InvoicePdf supaya PDF di sini dan pratinjau "Template invoice" selalu sama.
-        return InvoicePdf::make($invoice);
+        return InvoicePdf::make($invoice, $override);
     }
-
+    
     /**
      * Logo penagih untuk satu invoice: file baru > kotak "hapus logo" > tidak diubah.
      * Kalau tidak diubah, invoice baru (atau invoice lama yang belum punya data penagih) menyalin

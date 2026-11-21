@@ -640,3 +640,32 @@ html.refract[data-theme="light"] .topbar {
 .topbar .nav-links a.nav-cta,
 .topbar .nav-links a.nav-cta.is-current { color: var(--accent); }
 .topbar .user-chip { color: var(--text); }
+
+/* ==========================================================================
+   Ikon di menu samping/sidebar (Daftar invoice, Buat invoice, dst.)
+   Gayanya sama dengan ikon globe dan matahari di bar atas: garis tipis berwarna.
+   Tiap menu dikenali dari alamat tautannya, jadi file Blade tidak perlu diubah.
+   Warna ikon ada di dua baris --ico-1 sampai --ico-6 di bawah (satu untuk terang, satu untuk gelap).
+   ========================================================================== */
+.drawer a { display: flex; align-items: center; gap: 12px; }
+.drawer a::before {
+    content: "";
+    flex: none;
+    width: 20px;
+    height: 20px;
+    background: var(--ico-color, currentColor);
+    -webkit-mask: var(--ico) center / contain no-repeat;
+    mask: var(--ico) center / contain no-repeat;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.drawer a:hover::before { transform: scale(1.14) rotate(-8deg); }
+
+[data-theme="light"] .drawer { --ico-1: #5b46e6; --ico-2: #0f9d84; --ico-3: #d98a00; --ico-4: #16a34a; --ico-5: #db2777; --ico-6: #0284c7; }
+[data-theme="dark"] .drawer  { --ico-1: #b4a8ff; --ico-2: #5fe6c8; --ico-3: #ffc857; --ico-4: #4ade80; --ico-5: #f9a8d4; --ico-6: #7dd3fc; }
+
+.drawer a[href$="/invoices"] { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z'/%3E%3Cpath d='M14 2v6h6'/%3E%3Cpath d='M16 13H8'/%3E%3Cpath d='M16 17H8'/%3E%3Cpath d='M10 9H8'/%3E%3C/svg%3E"); --ico-color: var(--ico-1); }
+.drawer a[href$="/invoices/create"] { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 8v8'/%3E%3Cpath d='M8 12h8'/%3E%3C/svg%3E"); --ico-color: var(--ico-2); }
+.drawer a[href*="status=unpaid"] { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 6v6l4 2'/%3E%3C/svg%3E"); --ico-color: var(--ico-3); }
+.drawer a[href*="status=paid"] { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E"); --ico-color: var(--ico-4); }
+.drawer a[href*="/data-usaha"] { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z'/%3E%3Cpath d='M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2'/%3E%3Cpath d='M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2'/%3E%3Cpath d='M10 6h4'/%3E%3Cpath d='M10 10h4'/%3E%3Cpath d='M10 14h4'/%3E%3Cpath d='M10 18h4'/%3E%3C/svg%3E"); --ico-color: var(--ico-5); }
+.drawer a[href*="/template-invoice"] { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='7' x='3' y='3' rx='1'/%3E%3Crect width='9' height='7' x='3' y='14' rx='1'/%3E%3Crect width='5' height='7' x='16' y='14' rx='1'/%3E%3C/svg%3E"); --ico-color: var(--ico-6); }

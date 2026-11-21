@@ -100,6 +100,9 @@
         </div>
     </div>
 
+    @auth
+        @include('partials.pdf-picker')
+    @endauth
     <script src="{{ asset('js/app.js') }}"></script>
     @stack('scripts')
 </body>
