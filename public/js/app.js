@@ -880,3 +880,136 @@
         window.addEventListener('resize', drawMap);
     }
 })();
+
+/* ==========================================================================
+   HALUS: kaca navbar versi ringan untuk HP.
+   TEMPEL BLOK INI DI PALING BAWAH public/js/app.js (setelah blok "Kaca bening di navbar").
+   Untuk membatalkan: hapus dari komentar "HALUS" ini sampai akhir file.
+
+   Kaca navbar menggeser gambar di belakangnya tiga kali (merah, hijau, biru) lalu
+   menyatukannya, dan itu dihitung ulang di setiap frame saat di-scroll. Di HP, bedanya
+   cuma pinggiran warna setebal 1 sampai 2 piksel di ujung kapsul, nyaris tidak kelihatan,
+   tapi biayanya tiga kali lipat. Jadi di layar kecil / layar sentuh cukup satu kali geser.
+   Laptop tetap memakai versi lengkap yang sama persis dengan navbar contoh.
+   ========================================================================== */
+(function () {
+    'use strict';
+
+    var filter = document.getElementById('invoicely-glass-bar');
+    if (!filter || !window.matchMedia || !window.matchMedia('(max-width: 720px), (pointer: coarse)').matches) { return; }
+
+    var map = filter.querySelector('feImage');
+    var green = filter.querySelector('#igG');
+    if (!map || !green || map.parentNode !== filter) { return; }
+
+    // Buang semua tahap setelah peta (3 geseran, pemisah warna, penyatu, blur akhir).
+    while (filter.lastChild && filter.lastChild !== map) { filter.removeChild(filter.lastChild); }
+
+    // Ganti dengan satu geseran memakai kekuatan yang sama (GLASS.distortionScale).
+    var shift = document.createElementNS('http://www.w3.org/2000/svg', 'feDisplacementMap');
+    shift.setAttribute('in', 'SourceGraphic');
+    shift.setAttribute('in2', 'map');
+    shift.setAttribute('scale', green.getAttribute('scale'));
+    shift.setAttribute('xChannelSelector', 'R');
+    shift.setAttribute('yChannelSelector', 'G');
+    filter.appendChild(shift);
+})();
+
+/* ==========================================================================
+   TIRAI GANTI MODE: transisi terang <-> gelap yang mulus.
+   TEMPEL BLOK INI DI PALING BAWAH public/js/app.js (setelah blok "HALUS" kalau sudah ada).
+   Untuk membatalkan: hapus dari komentar ini sampai akhir file.
+
+   Kenapa tadinya patah-patah: browser harus memotret ulang seluruh halaman sebelum animasi pudar
+   bisa mulai, jadi layar "membeku" sebentar setelah tombol ditekan. Sekarang tirai berwarna tema
+   baru memudar masuk dulu (dikerjakan GPU, tetap mulus walau halaman sibuk), tema diganti DI BALIK
+   tirai (bagian yang berat tidak kelihatan), lalu tirai memudar keluar. Jalan di semua browser,
+   tidak hanya yang mendukung View Transitions.
+   Tombol lama dipasang ulang lewat penangkap klik di atas penangan lama, jadi kode lama tidak diubah.
+   ========================================================================== */
+(function () {
+    'use strict';
+
+    var html = document.documentElement;
+    var btn = document.getElementById('themeSwitch');
+    if (!btn) { return; }
+
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var busy = false;
+    // Dua angka ini SATU-SATUNYA yang perlu diubah untuk mengatur kecepatan (dipasang ke tirai lewat JS,
+    // jadi tidak ada angka kembar di CSS yang bisa selisih). Makin kecil = makin cepat.
+    //   FADE_IN  : lama tirai menutup halaman sebelum tema diganti.
+    //   FADE_OUT : lama tirai membuka lagi menampakkan tema baru.
+    var FADE_IN = 120;    // ms
+    var FADE_OUT = 280;   // ms
+    // true  = di HP (layar 720px ke bawah atau layar sentuh) tema langsung berganti, TANPA tirai.
+    // false = HP juga memakai tirai seperti laptop.
+    var INSTAN_DI_HP = true;
+    var phone = window.matchMedia ? window.matchMedia('(max-width: 720px), (pointer: coarse)') : { matches: false };
+
+    function apply(next) {
+        html.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch (e) {}
+        btn.setAttribute('aria-checked', next === 'dark' ? 'true' : 'false');
+    }
+
+    // Ganti langsung: transisi per-elemen dimatikan sebentar supaya semuanya berganti serentak dalam satu frame.
+    function instan(next) {
+        html.classList.add('theme-switching');
+        apply(next);
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () { html.classList.remove('theme-switching'); });
+        });
+    }
+
+    document.addEventListener('click', function (e) {
+        var t = e.target;
+        if (!t || !t.closest || !t.closest('#themeSwitch')) { return; }
+
+        // Hentikan penangan lama (View Transitions) supaya tidak jalan dua kali.
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        if (busy) { return; }
+
+        var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        if (reduce || (INSTAN_DI_HP && phone.matches)) { instan(next); return; }
+
+        busy = true;
+        var veil = document.createElement('div');
+        veil.className = 'theme-veil';
+        veil.setAttribute('data-theme', next);
+        veil.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(veil);
+        void veil.offsetWidth;                 // paksa gaya terhitung supaya transisi opacity jalan
+        veil.style.transitionDuration = FADE_IN + 'ms';
+        veil.classList.add('on');
+
+        var swapped = false;
+        function swap() {
+            if (swapped) { return; }
+            swapped = true;
+            // Halaman sudah tertutup penuh: aman mengganti tema di sini.
+            html.classList.add('theme-switching');   // matikan transisi per-elemen selama pergantian
+            apply(next);
+            // Tunggu 2 frame supaya tampilan baru sudah digambar sebelum tirai dibuka.
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    html.classList.remove('theme-switching');
+                    veil.style.transitionDuration = FADE_OUT + 'ms';
+                    veil.classList.remove('on');
+                    setTimeout(function () {
+                        if (veil.parentNode) { veil.parentNode.removeChild(veil); }
+                        busy = false;
+                    }, FADE_OUT + 40);
+                });
+            });
+        }
+        // Ganti tema TEPAT saat tirai benar-benar sudah penuh (event transitionend), bukan menebak lewat timer:
+        // kalau frame pertama tirai telat digambar, animasinya ikut telat dan timer saja bisa mengganti tema
+        // saat tirai baru separuh jadi. Timer di bawah hanya cadangan kalau event itu tidak datang.
+        veil.addEventListener('transitionend', function (ev) {
+            if (ev.target === veil && ev.propertyName === 'opacity') { swap(); }
+        });
+        setTimeout(swap, FADE_IN + 150);
+    }, true);
+})();

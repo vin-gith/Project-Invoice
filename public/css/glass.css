@@ -640,9 +640,8 @@ html.refract[data-theme="light"] .topbar {
 .topbar .nav-links a.nav-cta,
 .topbar .nav-links a.nav-cta.is-current { color: var(--accent); }
 .topbar .user-chip { color: var(--text); }
-
 /* ==========================================================================
-   Ikon di menu samping/sidebar (Daftar invoice, Buat invoice, dst.)
+   Ikon di menu samping (Daftar invoice, Buat invoice, dst.)
    Gayanya sama dengan ikon globe dan matahari di bar atas: garis tipis berwarna.
    Tiap menu dikenali dari alamat tautannya, jadi file Blade tidak perlu diubah.
    Warna ikon ada di dua baris --ico-1 sampai --ico-6 di bawah (satu untuk terang, satu untuk gelap).
@@ -669,3 +668,126 @@ html.refract[data-theme="light"] .topbar {
 .drawer a[href*="status=paid"] { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E"); --ico-color: var(--ico-4); }
 .drawer a[href*="/data-usaha"] { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z'/%3E%3Cpath d='M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2'/%3E%3Cpath d='M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2'/%3E%3Cpath d='M10 6h4'/%3E%3Cpath d='M10 10h4'/%3E%3Cpath d='M10 14h4'/%3E%3Cpath d='M10 18h4'/%3E%3C/svg%3E"); --ico-color: var(--ico-5); }
 .drawer a[href*="/template-invoice"] { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='7' x='3' y='3' rx='1'/%3E%3Crect width='9' height='7' x='3' y='14' rx='1'/%3E%3Crect width='5' height='7' x='16' y='14' rx='1'/%3E%3C/svg%3E"); --ico-color: var(--ico-6); }
+
+/* ==========================================================================
+   HALUS: HP tidak kepotong + scroll, transisi, dan gerakan ikon lebih ringan.
+   TEMPEL BLOK INI DI PALING BAWAH public/css/glass.css (setelah blok ikon menu samping).
+   Semuanya menimpa aturan di atasnya, jadi tidak ada yang perlu dihapus.
+   Untuk membatalkan: hapus dari komentar "HALUS" ini sampai akhir file.
+   ========================================================================== */
+
+/* ---------- 1. HP: halaman tidak boleh melebar (penyebab navbar kepotong) ----------
+   Saat dibuka, halaman masuk dengan menggeser dirinya 28px dari kanan (animasi pageIn).
+   Chrome HP menganggap geseran itu sebagai isi halaman yang lebih lebar dari layar, lalu
+   melebarkan layar layout (misalnya 360 jadi 388px) dan TIDAK mengecilkannya lagi walau
+   animasinya sudah selesai. Akibatnya navbar dan tombol paling kanan terpotong.
+   Di HP / layar sentuh halaman masuk dari bawah saja. Laptop tetap masuk dari kanan. */
+@media (max-width: 720px), (pointer: coarse) {
+    @keyframes pageIn {
+        from { transform: translateY(18px); }
+        to   { transform: none; }
+    }
+}
+
+/* ---------- 2. Kartu tanpa backdrop-filter ----------
+   Tiap kartu dulu memburamkan latar di belakangnya (blur + saturate), dan latar itu bergerak
+   terus saat di-scroll. Akibatnya semua kartu yang terlihat dihitung ulang di setiap frame,
+   termasuk saat kartu baru muncul. Latar kita gradasi lembut, jadi blur-nya nyaris tidak
+   kelihatan. Isi kaca (--glass-fill), garis tepi, dan kilap tetap sama, hanya biaya hitungnya
+   yang hilang. Yang tetap memakai blur: menu samping, jendela konfirmasi, saran pencarian, dan
+   navbar (hanya muncul sebentar, atau memang satu-satunya yang membelokkan tulisan di belakangnya). */
+.card,
+.cta {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+/* ---------- 3. Lapisan yang menumpuk ----------
+   will-change membuat tiap elemen .sr punya lapisan GPU sendiri selamanya, bahkan setelah
+   selesai muncul. Browser sudah otomatis membuat lapisan saat animasinya jalan. */
+.js .sr,
+.js .sr.in { will-change: auto; }
+
+/* ---------- 4. Gradasi judul: bergerak sebentar lalu diam ----------
+   background-position bukan animasi GPU: setiap frame teksnya digambar ulang di CPU.
+   Dulu terus berulang selamanya. Sekarang dua kali jalan (kembali ke posisi awal), lalu diam. */
+.hero h1 .accent { animation: glassShine 4.5s ease-in-out 2 alternate both; }
+
+/* ---------- 5. Gerakan ikon ----------
+   - Garis tengah tombol menu dulu dianimasikan lewat width (menghitung ulang tata letak di
+     setiap frame, dan itu terjadi di dalam navbar kaca). Sekarang pakai scaleX (GPU).
+   - Jarak huruf logo "Invoicely" saat di-hover juga dianimasikan (teks dihitung ulang tiap frame).
+     Warna aksen saat hover tetap ada. */
+.menu-btn span { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease; }
+.drawer-open .menu-btn span:nth-child(2) { width: 18px; opacity: 0; transform: scaleX(0); }
+.brand { transition: color 0.2s ease; }
+.brand:hover { letter-spacing: -0.03em; }
+
+/* Tirai gelap di belakang menu samping: tanpa blur layar penuh. Menu samping sendiri tetap kaca. */
+.drawer-open .scrim {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(24, 18, 56, 0.5);
+}
+[data-theme="dark"] .drawer-open .scrim { background: rgba(4, 3, 14, 0.6); }
+
+/* ---------- 6. HP: latar diam ----------
+   Di HP, gerakan latar yang tidak pernah berhenti menghabiskan baterai dan bersaing dengan
+   scroll. Di laptop tetap bergerak pelan. */
+@media (max-width: 720px), (pointer: coarse) {
+    body::before,
+    body::after,
+    .blob,
+    .hero h1 .accent { animation: none; }
+}
+
+/* ---------- 7. Navbar HP: semua tombol muat di dalam kapsul ---------- */
+@media (max-width: 480px) {
+    .topbar {
+        width: calc(100% - 16px);
+        margin-top: 8px;
+        gap: 6px;
+        padding: 7px 8px 7px 14px;
+    }
+    .topbar .brand { font-size: 1.08rem; }
+    .nav-links { flex: 0 1 auto; min-width: 0; }
+    .nav-links a { padding: 8px 6px; font-size: 0.84rem; }
+    .menu-btn { width: 36px; height: 36px; }
+    .lang-btn,
+    .theme-switch { height: 36px; min-width: 36px; }
+    .lang-btn { padding: 0 8px 0 7px; gap: 5px; font-size: 0.78rem; }
+    .topbar .lang-btn { margin-left: 2px; }
+    .topbar .lang-btn::before { left: -5px; height: 20px; }
+}
+/* Layar sangat sempit (350px ke bawah): kode bahasa (ID/EN) disembunyikan, ikon globe-nya tetap. */
+@media (max-width: 350px) {
+    .lang-btn { padding: 0; width: 36px; }
+    .lang-code { display: none; }
+}
+
+
+/* ==========================================================================
+   TIRAI GANTI MODE: transisi terang <-> gelap yang mulus.
+   TEMPEL BLOK INI DI PALING BAWAH public/css/glass.css (setelah blok "HALUS" kalau sudah ada).
+   Untuk membatalkan: hapus dari komentar ini sampai akhir file (dan blok yang sama di app.js).
+   ========================================================================== */
+.theme-veil {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483000;
+    pointer-events: none;
+    opacity: 0;
+    /* Warna latar tema TUJUAN: elemen ini membawa data-theme tema berikutnya, jadi variabelnya otomatis ikut. */
+    background: var(--orbs-b), var(--orbs-a), var(--bg);
+    will-change: opacity;
+    /* keluar (memudar menampakkan tema baru). Kurva "ease-out": awalnya cepat, jadi isi halaman
+       cepat kelihatan lagi dan tirai tidak terasa menggantung. Durasi sebenarnya diatur
+       FADE_OUT di app.js (angka di sini hanya cadangan kalau JS gagal). */
+    transition: opacity 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+/* masuk (menutup halaman sebelum tema diganti). Durasi sebenarnya diatur FADE_IN di app.js. */
+.theme-veil.on {
+    opacity: 1;
+    transition-duration: 0.12s;
+    transition-timing-function: ease-in-out;
+}

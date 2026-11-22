@@ -9,7 +9,7 @@
          bahwa animasi scroll boleh dipakai (tanpa JavaScript, semua konten tetap tampil). --}}
     <script>
         (function () {
-    document.documentElement.classList.add('js');
+    document.documentElement.classList.add('js');   
     // Landing selalu dibuka terang. Pilihan mode baru diingat setelah pengunjung menekan tombolnya.
     document.documentElement.setAttribute('data-theme', 'light');
     try { localStorage.setItem('theme', 'light'); } catch (e) {}})();
