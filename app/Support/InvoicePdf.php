@@ -20,7 +20,9 @@ class InvoicePdf
     public static function make(Invoice $invoice, array $override = [])
     {
         $invoice->loadMissing('items');
-        $design = BusinessProfile::design($override);
+        // Pengaturan tampilan milik pemilik invoice (bukan akun yang sedang login), supaya link PDF
+        // yang dibuka pelanggan tanpa login tetap memakai template si penagih. Invoice contoh: akun yang login.
+        $design = BusinessProfile::design($override, $invoice->user_id);
 
         // Logo di kop dan watermark memakai logo milik invoice ini, bukan logo "Data usaha" saat ini.
         $logoPath = $invoice->sellerLogoPath();

@@ -18,11 +18,12 @@
     <link rel="stylesheet" href="{{ asset('css/glass.css') }}">
 </head>
 <body>
-    <header class="topbar">
+    {{-- landing-nav: navbar turun pelan saat halaman dibuka, tidak langsung muncul (animasi navDrop di app.css). --}}
+    <header class="topbar landing-nav">
         <a class="brand" href="{{ route('home') }}">Invoicely</a>
-
+        
+        {{-- ============ Navbar section ============ --}}
         <nav class="nav-links" aria-label="Bagian halaman">
-            <a href="#contoh">Contoh invoice</a>
             <a href="#fitur">Fitur</a>
             <a href="#cara-kerja">Cara kerja</a>
             <a href="#mulai" class="nav-cta">Daftar / Masuk</a>
@@ -42,57 +43,21 @@
             <div class="blob blob-b"></div>
 
             <div class="l-wrap hero-center">
-                <p class="l-eyebrow reveal" style="--i:0">Sistem invoice digital</p>
-                <h1 class="reveal" style="--i:1">Invoice rapi, <span class="accent">tagihan jelas</span>, pembayaran tercatat.</h1>
-                <p class="l-lead reveal" style="--i:2">
+                {{-- intro-*: animasi pembuka (app.css, bagian "Animasi pembuka landing").
+                     Judul dipecah per kata (span.w, urutan --w); "tagihan jelas" dibungkus utuh supaya gradasinya tetap. --}}
+                <p class="l-eyebrow intro-eyebrow">Sistem invoice digital</p>
+                <h1 class="intro-title"><span class="w" style="--w:0">Invoice</span> <span class="w" style="--w:1">rapi,</span> <span class="w" style="--w:2"><span class="accent">tagihan jelas</span>,</span> <span class="w" style="--w:3">pembayaran</span> <span class="w" style="--w:4">tercatat.</span></h1>
+                <p class="l-lead intro-lead">
                     Invoicely membantu kamu membuat faktur penjualan, menghitung total tagihan secara otomatis,
                     mencatat status lunas, dan mengunduhnya sebagai PDF. Semuanya dari satu tempat.
                 </p>
-                <ul class="hero-points reveal" style="--i:4">
-                    <li>Nomor invoice otomatis</li>
-                    <li>Unduh PDF sekali klik</li>
-                    <li>Template invoice</li>
-                    <li>Cetak invoice otomatis</li>
-                    <li>Input logo otomatis</li>
+                <ul class="hero-points intro-points">
+                    <li style="--p:0">Nomor invoice otomatis</li>
+                    <li style="--p:1">Unduh PDF sekali klik</li>
+                    <li style="--p:2">Template invoice</li>
+                    <li style="--p:3">Cetak invoice otomatis</li>
+                    <li style="--p:4">Input logo otomatis</li>
                 </ul>
-            </div>
-
-            {{-- Contoh daftar invoice (hiasan, data fiktif). Badge pada baris pertama berganti sendiri. --}}
-            <div class="l-wrap reveal" style="--i:5" id="contoh" aria-hidden="true">
-                <div class="card demo">
-                    <div class="demo-bar">
-                        <div class="demo-left">
-                            <span class="btn btn-sm btn-primary">Invoice baru</span>
-                            <strong>Daftar invoice</strong>
-                        </div>
-                        <span class="demo-search">Cari nomor atau pelanggan...</span>
-                        <span class="demo-count">1-8 / 8</span>
-                    </div>
-                    <div class="demo-scroll">
-                        <table class="demo-table">
-                            <thead>
-                                <tr>
-                                    <th>Nomor</th>
-                                    <th>Pelanggan</th>
-                                    <th class="hide-s">Tgl invoice</th>
-                                    <th class="hide-s">Jatuh tempo</th>
-                                    <th class="r">Total</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="row-reveal" style="--i:6"><td class="no">INV-10-11-2026-0004</td><td>Toko Maju Jaya</td><td class="hide-s">10/11/2026</td><td class="hide-s due-now">Hari ini</td><td class="r">Rp 954.600</td><td><span class="badge badge-unpaid" id="mockBadge">Belum lunas</span></td></tr>
-                                <tr class="row-reveal" style="--i:7"><td class="no">INV-10-11-2026-0003</td><td>CV Berkah Sentosa</td><td class="hide-s">10/11/2026</td><td class="hide-s">24/11/2026</td><td class="r">Rp 3.330.000</td><td><span class="badge badge-paid">Lunas</span></td></tr>
-                                <tr class="row-reveal" style="--i:8"><td class="no">INV-09-11-2026-0002</td><td>Apotek Sehat Sejahtera</td><td class="hide-s">09/11/2026</td><td class="hide-s">16/11/2026</td><td class="r">Rp 1.275.000</td><td><span class="badge badge-unpaid">Belum lunas</span></td></tr>
-                                <tr class="row-reveal" style="--i:9"><td class="no">INV-09-11-2026-0001</td><td>PT Karya Mandiri</td><td class="hide-s">09/11/2026</td><td class="hide-s">23/11/2026</td><td class="r">Rp 12.450.000</td><td><span class="badge badge-paid">Lunas</span></td></tr>
-                                <tr class="row-reveal" style="--i:10"><td class="no">INV-02-11-2026-0001</td><td>Warung Bu Rina</td><td class="hide-s">02/11/2026</td><td class="hide-s">16/11/2026</td><td class="r">Rp 486.500</td><td><span class="badge badge-unpaid">Belum lunas</span></td></tr>
-                                <tr class="row-reveal" style="--i:11"><td class="no">INV-28-10-2026-0002</td><td>Bengkel Jaya Motor</td><td class="hide-s">28/10/2026</td><td class="hide-s due-late">9 hari lalu</td><td class="r">Rp 2.180.000</td><td><span class="badge badge-overdue">Terlambat</span></td></tr>
-                                <tr class="row-reveal" style="--i:12"><td class="no">INV-20-10-2026-0001</td><td>Toko Bangunan Abadi</td><td class="hide-s">20/10/2026</td><td class="hide-s due-late">17 hari lalu</td><td class="r">Rp 7.620.000</td><td><span class="badge badge-overdue">Terlambat</span></td></tr>
-                                <tr class="row-reveal" style="--i:13"><td class="no">INV-05-10-2026-0001</td><td>UD Sumber Rejeki</td><td class="hide-s">05/10/2026</td><td class="hide-s">19/10/2026</td><td class="r">Rp 915.000</td><td><span class="badge badge-paid">Lunas</span></td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
         </section>
 

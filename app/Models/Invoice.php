@@ -67,7 +67,7 @@ class Invoice extends Model
      */
     public function seller(): object
     {
-        $biz = BusinessProfile::current();
+        $biz = BusinessProfile::current($this->user_id);
 
         return (object) [
             'name' => $this->seller_name ?: $biz->name,
@@ -83,7 +83,7 @@ class Invoice extends Model
      */
     public function sellerLogoPath(): ?string
     {
-        return $this->seller_name ? $this->seller_logo_path : BusinessProfile::stored()?->logo_path;
+        return $this->seller_name ? $this->seller_logo_path : BusinessProfile::stored($this->user_id)?->logo_path;
     }
 
     public function isPaid(): bool

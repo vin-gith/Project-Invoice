@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
 
 class BusinessProfile extends Model
 {
@@ -49,19 +48,25 @@ class BusinessProfile extends Model
         return $ready ??= Schema::hasTable('business_profiles') && Schema::hasColumn('business_profiles', 'user_id');
     }
 
-    /** Data usaha milik akun yang sedang login, kalau sudah pernah disimpan (null kalau belum). */
-    public static function stored(): ?self
+    /**
+     * Data usaha milik sebuah akun, kalau sudah pernah disimpan (null kalau belum).
+     * $userId kosong = akun yang sedang login. Diisi pemilik invoice saat PDF dibuka pelanggan lewat link
+     * WhatsApp (tanpa login), supaya tampilannya tetap memakai data usaha dan template si penagih.
+     */
+    public static function stored(?int $userId = null): ?self
     {
-        return static::ready() && Auth::check() ? static::where('user_id', Auth::id())->first() : null;
+        $userId ??= Auth::id();
+
+        return static::ready() && $userId ? static::where('user_id', $userId)->first() : null;
     }
 
     /**
      * Data usaha yang dipakai di halaman invoice dan PDF.
      * Kalau belum pernah diisi (atau tabelnya belum dimigrasi), dipakai nilai bawaan dari config/invoicely.php.
      */
-    public static function current(): self
+    public static function current(?int $userId = null): self
     {
-        $profile = static::stored();
+        $profile = static::stored($userId);
         $profile ??= new static();
 
         foreach (['name', 'address', 'email', 'phone'] as $field) {
@@ -71,19 +76,6 @@ class BusinessProfile extends Model
         }
 
         return $profile;
-    }
-
-    /** Isi logo sebagai data URI (dipakai di PDF supaya tidak bergantung pada alamat file/URL). */
-    public function logoDataUri(): ?string
-    {
-        if (! $this->logo_path || ! Storage::disk('local')->exists($this->logo_path)) {
-            return null;
-        }
-
-        $binary = Storage::disk('local')->get($this->logo_path);
-        $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($binary) ?: 'image/png';
-
-        return 'data:' . $mime . ';base64,' . base64_encode($binary);
     }
 
     /** Campur warna dengan putih (0 = warna asli, 1 = putih) untuk latar lembut di PDF. */
@@ -107,10 +99,11 @@ class BusinessProfile extends Model
      *
      * $override: nilai sementara yang menimpa pengaturan tersimpan HANYA untuk pembuatan PDF ini
      * (tidak ditulis ke database). Dipakai pratinjau supaya template bisa dicoba dulu sebelum disimpan.
+     * $userId: pemilik pengaturan (kosong = akun yang sedang login).
      */
-    public static function design(array $override = []): array
+    public static function design(array $override = [], ?int $userId = null): array
     {
-        $p = static::current();
+        $p = static::current($userId);
 
         foreach (self::DESIGN_FIELDS as $field) {
             if (array_key_exists($field, $override)) {
@@ -129,8 +122,7 @@ class BusinessProfile extends Model
             'color' => $color,
             'tint' => self::tint($color, 0.9),
             'soft' => self::tint($color, 0.75),
-            'logo' => $p->logoDataUri(),
-            'watermark' => \App\Support\LogoImage::watermark($p->logo_path),
+            // 'logo' dan 'watermark' diisi InvoicePdf::make dari logo milik invoice itu sendiri.
             'bank_name' => $p->bank_name,
             'bank_account' => $p->bank_account,
             'bank_holder' => $p->bank_holder,

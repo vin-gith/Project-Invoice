@@ -1,0 +1,88 @@
+/* ==========================================================================
+   Halaman Laporan (resources/views/reports/index.blade.php).
+   Grafik batang SVG dari server: satu seri, warna aksen, batang maks 24 unit dengan ujung atas
+   membulat 4, garis bantu tipis, angka langsung hanya di bulan terbesar dan bulan ini.
+   ========================================================================== */
+
+/* Warna batang: diuji (validator dataviz) terhadap permukaan kartu terang dan gelap.
+   Mode gelap memakai satu langkah lebih gelap dari --accent supaya batang tidak terlalu menyala. */
+:root { --chart-bar: #5b46e6; }
+[data-theme="dark"] { --chart-bar: #8f7af0; }
+
+.stat-sub { display: block; margin-top: 4px; color: var(--muted); font-size: 0.8rem; }
+.stat-sub.is-up { color: var(--paid); }
+.stat-sub.is-down { color: var(--overdue); }
+
+.report-filter { display: flex; align-items: center; gap: 12px; margin: 22px 0 14px; flex-wrap: wrap; }
+
+.report-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+}
+@media (max-width: 860px) { .report-grid { grid-template-columns: 1fr; } }
+
+.report-card { padding: 20px; }
+.report-head { margin-bottom: 14px; }
+.report-head h2 { font-size: 1.05rem; margin: 0 0 4px; }
+.report-head p { margin: 0; font-size: 0.86rem; }
+.report-head .text { color: var(--text); }
+.report-more { margin: 12px 0 0; font-size: 0.88rem; }
+
+/* ---------- Grafik ---------- */
+.chart { position: relative; }
+.chart-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart-svg text { font-family: inherit; font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.chart-grid line,
+.chart-base { stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.chart-base { stroke: color-mix(in srgb, var(--muted) 45%, transparent); }
+
+.chart-col { fill: var(--chart-bar); transition: filter 0.15s ease; }
+.chart-hit { fill: transparent; }
+.chart-value { fill: var(--text) !important; font-weight: 600; }
+.chart-bar { outline: none; cursor: default; }
+.chart-bar.is-active .chart-col { filter: brightness(1.18) saturate(1.1); }
+.chart-bar:focus-visible .chart-hit { stroke: var(--accent); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+
+/* Layar sempit: SVG mengecil, jadi huruf di dalamnya dibesarkan supaya tetap sekitar 10px di layar. */
+@media (max-width: 560px) {
+    .chart-svg text { font-size: 19px; }
+}
+
+.chart-tip {
+    position: absolute;
+    z-index: 5;
+    transform: translate(-50%, -100%);
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 7px 10px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    pointer-events: none;
+    white-space: nowrap;
+}
+.chart-tip[hidden] { display: none; }
+.chart-tip-value { font-size: 0.95rem; color: var(--text); }
+.chart-tip-label { font-size: 0.76rem; color: var(--muted); }
+
+.chart-table { margin-top: 12px; font-size: 0.88rem; }
+.chart-table summary { cursor: pointer; color: var(--muted); width: max-content; }
+.chart-table summary:hover { color: var(--text); }
+.chart-table .table-wrap { margin-top: 10px; }
+
+/* ---------- Pelanggan teratas ---------- */
+.top-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 12px;
+    padding: 10px 0;
+    border-top: 1px solid var(--line);
+}
+.top-row:first-of-type { border-top: 0; }
+.top-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.top-total { text-align: right; font-variant-numeric: tabular-nums; }
+.top-count { grid-column: 1 / -1; font-size: 0.8rem; }

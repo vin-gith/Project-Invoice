@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -19,6 +20,15 @@ class LogoImage
 
         $binary = Storage::disk('local')->get($path);
         $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($binary) ?: 'image/png';
+
+        // dompdf butuh ekstensi PHP GD untuk memasang PNG (terutama yang transparan). Tanpa GD, pembuatan PDF
+        // gagal total (error 500 di Unduh, Cetak, dan pratinjau template). Jadi logo PNG dilewati dan PDF tetap jadi
+        // tanpa logo. JPG tidak butuh GD. Supaya logo PNG tampil, aktifkan "extension=gd" di php.ini lalu restart server.
+        if ($mime === 'image/png' && ! extension_loaded('gd')) {
+            Log::warning('[Invoicely] Logo PNG tidak dipasang di PDF karena ekstensi PHP GD belum aktif (extension=gd di php.ini).', ['path' => $path]);
+
+            return null;
+        }
 
         return 'data:' . $mime . ';base64,' . base64_encode($binary);
     }

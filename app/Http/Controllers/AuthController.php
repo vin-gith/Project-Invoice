@@ -120,11 +120,11 @@ class AuthController extends Controller
             // Minimal 8 karakter dan wajib mengandung huruf, angka, dan simbol.
             // Regex memakai tiga lookahead: masing-masing memastikan ada minimal satu
             // huruf, satu angka, dan satu simbol (bukan huruf/angka/spasi) di mana pun posisinya.
-            // Panjang dikunci tepat 8 karakter (min:8 dan max:8). Kalau suatu saat mau
-            // dilonggarkan, ubah angka max di sini (batas teknis bcrypt: 72 karakter),
-            // lalu samakan maxlength di register.blade.php.
+            // Panjang 8 sampai 72 karakter (72 = batas teknis bcrypt). Dulu dikunci tepat 8,
+            // tapi itu menolak password yang lebih panjang dan lebih kuat.
+            // Kalau angka di sini diubah, samakan maxlength di register.blade.php dan reset-password.blade.php.
             'password' => [
-                'required', 'string', 'min:8', 'max:8', 'confirmed',
+                'required', 'string', 'min:8', 'max:72', 'confirmed',
                 'regex:/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d\s])/',
             ],
         ], [

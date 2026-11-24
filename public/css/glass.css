@@ -791,3 +791,38 @@ html.refract[data-theme="light"] .topbar {
     transition-duration: 0.12s;
     transition-timing-function: ease-in-out;
 }
+
+/* ==========================================================================
+   HALAMAN DALAM: pindah halaman dan muncul dengan halus.
+   TEMPEL BLOK INI DI PALING BAWAH public/css/glass.css. Untuk membatalkan: hapus dari komentar ini sampai akhir file
+   (dan kembalikan 1 baris di app.js yang diberi tanda "HALUS-NAV").
+
+   Dulu: klik menu -> halaman geser keluar 0,22 dtk -> layar menunggu server -> isi halaman muncul satu per satu
+   sampai sekitar 1 detik (15 baris tabel, 4 kartu). Rangkaian animasi itu bertabrakan dengan kerja browser saat
+   halaman baru dimuat, jadi terasa patah-patah.
+   Sekarang: browser memotret halaman lama, memuat yang baru, lalu memudarkan keduanya (View Transitions antar-halaman,
+   dikerjakan GPU). Halaman lama tetap tampil selama menunggu server. Karena pudarnya sudah menjadi animasi masuk,
+   animasi bertahap di halaman dalam dimatikan. Browser yang belum mendukung tetap memakai cara lama.
+   ========================================================================== */
+
+/* Keadaan akhir animasi masuk sama dengan keadaan biasa, jadi tidak perlu ditahan setelah selesai
+   (fill-mode "both" menahannya terus; "backwards" hanya berlaku selama jeda sebelum animasi mulai). */
+.reveal,
+.row-reveal,
+.badge { animation-fill-mode: backwards; }
+
+@supports at-rule(@view-transition) {
+    @media (prefers-reduced-motion: no-preference) {
+        @view-transition { navigation: auto; }
+
+        html .page { animation: none; }
+        .page:not(.landing) .reveal,
+        .page:not(.landing) .row-reveal { animation: none; }
+
+        /* Pindah halaman: pudar cepat. Ganti mode (tema) tetap 0,3 detik. */
+        html::view-transition-old(root),
+        html::view-transition-new(root) { animation-duration: 0.22s; animation-timing-function: ease; }
+        html.theme-switching::view-transition-old(root),
+        html.theme-switching::view-transition-new(root) { animation-duration: 0.3s; }
+    }
+}

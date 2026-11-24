@@ -45,13 +45,13 @@
                     <label for="password">Password baru</label>
                     <div class="pw-wrap">
                         <input id="password" type="password" name="password"
-                               required minlength="8" maxlength="8" autocomplete="new-password"
-                               pattern="(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d\s]).{8}"
-                               title="Tepat 8 karakter, berisi huruf, angka, dan simbol.">
+                               required minlength="8" maxlength="72" autocomplete="new-password"
+                               pattern="(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d\s]).{8,72}"
+                               title="8 sampai 72 karakter, berisi huruf, angka, dan simbol.">
                         <button type="button" class="pw-toggle" data-pw-toggle aria-pressed="false" aria-label="Tampilkan password">Tampilkan</button>
                     </div>
                     <ul class="rules" id="pwRules">
-                        <li data-rule="len">Tepat 8 karakter</li>
+                        <li data-rule="len">Minimal 8 karakter</li>
                         <li data-rule="letter">Ada huruf</li>
                         <li data-rule="num">Ada angka</li>
                         <li data-rule="sym">Ada simbol (contoh: ! @ # ?)</li>
@@ -62,7 +62,7 @@
                     <label for="password_confirmation">Ulangi password</label>
                     <div class="pw-wrap">
                         <input id="password_confirmation" type="password" name="password_confirmation"
-                               required minlength="8" maxlength="8" autocomplete="new-password">
+                               required minlength="8" maxlength="72" autocomplete="new-password">
                         <button type="button" class="pw-toggle" data-pw-toggle aria-pressed="false" aria-label="Tampilkan password">Tampilkan</button>
                     </div>
                 </div>
@@ -98,7 +98,7 @@
             // Daftar syarat password menyala hijau satu per satu saat terpenuhi.
             var items = document.querySelectorAll('#pwRules li');
             var tests = {
-                len: function (v) { return v.length === 8; },
+                len: function (v) { return v.length >= 8 && v.length <= 72; },
                 letter: function (v) { return /[A-Za-z]/.test(v); },
                 num: function (v) { return /\d/.test(v); },
                 sym: function (v) { return /[^A-Za-z\d\s]/.test(v); }

@@ -99,9 +99,27 @@
                 </button>
             </form>
 
+            {{-- Membuka WhatsApp dengan pesan + link PDF yang sudah terisi. Kalimatnya ikut status invoice (lihat App\Support\WhatsApp). --}}
+            <a class="btn btn-ghost btn-block" href="{{ route('invoices.whatsapp', $invoice) }}" target="_blank" rel="noopener" data-no-transition>
+                @if ($invoice->isPaid())
+                    Kirim terima kasih (WhatsApp)
+                @elseif ($invoice->statusKey() === 'overdue')
+                    Kirim pengingat (WhatsApp)
+                @else
+                    Kirim lewat WhatsApp
+                @endif
+            </a>
+            {{-- Link PDF di pesan memakai alamat yang sedang dibuka. Alamat lokal tidak bisa dibuka dari HP pelanggan. --}}
+            @if (in_array(request()->getHost(), ['127.0.0.1', 'localhost', '::1', '[::1]'], true))
+                <small class="field-hint is-warn">Kamu membuka aplikasi lewat {{ request()->getHost() }}, jadi link PDF di pesan tidak bisa dibuka pelanggan. Kirim dari alamat publik (misalnya link port forwarding).</small>
+            @endif
             <a class="btn btn-ghost btn-block" href="{{ route('invoices.pdf', $invoice) }}" data-no-transition>Unduh PDF</a>
             <a class="btn btn-ghost btn-block" href="{{ route('invoices.print', $invoice) }}" target="_blank" rel="noopener" data-no-transition>Cetak</a>
             <a class="btn btn-ghost btn-block" href="{{ route('invoices.edit', $invoice) }}">Ubah invoice</a>
+            <form method="POST" action="{{ route('invoices.duplicate', $invoice) }}">
+                @csrf
+                <button type="submit" class="btn btn-ghost btn-block">Duplikat invoice</button>
+            </form>
 
             <form method="POST" action="{{ route('invoices.destroy', $invoice) }}"
                   data-confirm="Invoice {{ $invoice->number }} akan dihapus permanen. Lanjutkan?">

@@ -55,9 +55,12 @@
 /* Ganti tema: browser memotret tampilan lama lalu memudarkannya ke tampilan baru (View Transitions).
    Ini dikerjakan GPU, jadi tidak patah-patah seperti menganimasikan warna ratusan elemen sekaligus.
    Selama pergantian, transisi per elemen dimatikan supaya tidak saling tabrakan. Class dipasang oleh JS. */
+/* Animasi yang berjalan terus (bulatan latar, blob, kilap judul) juga dijeda selama pergantian: tampilan baru
+   yang sedang dipudarkan itu "hidup", jadi kalau ada yang bergerak, seluruh halaman (termasuk blur kaca navbar)
+   digambar ulang di setiap frame dan pudarnya patah-patah. Dijeda 0,3 detik saja, lalu lanjut dari posisi yang sama. */
 html.theme-switching *,
 html.theme-switching *::before,
-html.theme-switching *::after { transition: none !important; }
+html.theme-switching *::after { transition: none !important; animation-play-state: paused !important; }
 ::view-transition-old(root),
 ::view-transition-new(root) { animation-duration: 0.3s; animation-timing-function: ease; }
 
@@ -720,6 +723,51 @@ html { scroll-behavior: smooth; }
 .hero-center h1 { max-width: 20ch; margin-left: auto; margin-right: auto; }
 .hero-center .l-lead { max-width: 640px; margin-left: auto; margin-right: auto; }
 .hero-center .hero-cta, .hero-center .hero-points { justify-content: center; }
+
+/* Navbar halaman pembuka: turun pelan dari atas saat halaman dibuka, tidak langsung muncul.
+   "backwards" = setelah selesai tidak menahan gaya apa pun, jadi kaca navbar tetap normal. */
+.landing-nav { animation: navDrop 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.25s backwards; }
+@keyframes navDrop {
+    from { opacity: 0; transform: translateY(-24px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Animasi pembuka landing ----------
+   Urutan (detik setelah halaman tampil): blob latar 0 > label kecil 0,15 > judul per kata 0,3-0,66 >
+   paragraf 0,85 > lima poin 1,05-1,33. Hanya opacity, transform, dan blur singkat; "backwards" = sesudah
+   selesai tidak menahan gaya apa pun. Pengaturan "kurangi animasi" mematikannya (blok reduced-motion di bawah). */
+.intro-eyebrow { animation: introUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s backwards; }
+
+.intro-title .w {
+    display: inline-block;
+    animation: introWord 0.9s cubic-bezier(0.22, 1, 0.36, 1) calc(0.3s + var(--w, 0) * 0.09s) backwards;
+}
+@keyframes introWord {
+    from { opacity: 0; transform: translateY(0.45em) rotate(2deg); filter: blur(6px); }
+    to   { opacity: 1; transform: none; filter: none; }
+}
+
+.intro-lead { animation: introUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.85s backwards; }
+@keyframes introUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+}
+
+.intro-points li { animation: introPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) calc(1.05s + var(--p, 0) * 0.07s) backwards; }
+@keyframes introPop {
+    from { opacity: 0; transform: translateY(8px) scale(0.92); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* Blob latar membesar pelan, lalu lanjut bergerak seperti biasa. Hanya di laptop: di HP blob memang diam (glass.css). */
+@media (min-width: 721px) and (pointer: fine) {
+    .landing .blob-a { animation: blobIn 1.6s ease-out backwards, drift 14s ease-in-out 1.6s infinite alternate; }
+    .landing .blob-b { animation: blobIn 1.6s ease-out 0.2s backwards, drift 18s ease-in-out 1.8s infinite alternate-reverse; }
+}
+@keyframes blobIn {
+    from { opacity: 0; transform: scale(0.6); }
+    to   { opacity: 1; transform: none; }
+}
 .hero > .l-wrap.reveal { position: relative; z-index: 1; margin-top: 72px; }
 .demo { padding: 0; overflow: hidden; box-shadow: var(--shadow-lg); will-change: transform; animation: floaty 9s ease-in-out infinite; }
 @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }

@@ -125,9 +125,9 @@ class PasswordResetController extends Controller
         $data = $request->validate([
             'email' => ['required', 'email', 'max:120'],
             'code' => ['required', 'digits:6'],
-            // Aturan sama dengan saat daftar: tepat 8 karakter, berisi huruf, angka, dan simbol.
+            // Aturan sama dengan saat daftar: 8 sampai 72 karakter, berisi huruf, angka, dan simbol.
             'password' => [
-                'required', 'string', 'min:8', 'max:8', 'confirmed',
+                'required', 'string', 'min:8', 'max:72', 'confirmed',
                 'regex:/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d\s])/',
             ],
         ], [

@@ -27,29 +27,8 @@
         // supaya terjemahan otomatis browser tidak rusak saat mode diganti.
     }
 
-    if (themeSwitch) {
-        paintThemeSwitch();
-        var applyTheme = function (next) {
-            html.setAttribute('data-theme', next);
-            try { localStorage.setItem('theme', next); } catch (e) {}
-            paintThemeSwitch();
-        };
-
-        themeSwitch.addEventListener('click', function () {
-            var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-
-            // Browser yang mendukung View Transitions: pudar halus (ringan, dikerjakan GPU).
-            // Browser lain atau pengguna yang mematikan animasi: ganti langsung tanpa animasi.
-            if (!document.startViewTransition || reduceMotion) {
-                applyTheme(next);
-                return;
-            }
-            html.classList.add('theme-switching');
-            var vt = document.startViewTransition(function () { applyTheme(next); });
-            var done = function () { html.classList.remove('theme-switching'); };
-            vt.finished.then(done, done);
-        });
-    }
+    // Klik tombolnya diurus blok "GANTI MODE" di bagian bawah file ini.
+    if (themeSwitch) { paintThemeSwitch(); }
 
     /* ---------------------------------------------------------------
        Menu geser (drawer)
@@ -100,6 +79,10 @@
         try { url = new URL(a.href, window.location.href); } catch (err) { return; }
         if (url.origin !== window.location.origin) { return; }
         if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) { return; }
+
+        // HALUS-NAV: browser yang mendukung View Transitions antar-halaman memudarkan halaman sendiri (lihat glass.css),
+        // jadi link dibiarkan berjalan normal, tanpa menunda 0,22 detik untuk animasi geser keluar.
+        if (!reduceMotion && window.CSS && CSS.supports && CSS.supports('at-rule(@view-transition)')) { return; }
 
         e.preventDefault();
         if (reduceMotion) { window.location.href = a.href; return; }
@@ -916,16 +899,17 @@
 })();
 
 /* ==========================================================================
-   TIRAI GANTI MODE: transisi terang <-> gelap yang mulus.
+   GANTI MODE terang <-> gelap: transisi halus.
    TEMPEL BLOK INI DI PALING BAWAH public/js/app.js (setelah blok "HALUS" kalau sudah ada).
    Untuk membatalkan: hapus dari komentar ini sampai akhir file.
 
-   Kenapa tadinya patah-patah: browser harus memotret ulang seluruh halaman sebelum animasi pudar
-   bisa mulai, jadi layar "membeku" sebentar setelah tombol ditekan. Sekarang tirai berwarna tema
-   baru memudar masuk dulu (dikerjakan GPU, tetap mulus walau halaman sibuk), tema diganti DI BALIK
-   tirai (bagian yang berat tidak kelihatan), lalu tirai memudar keluar. Jalan di semua browser,
-   tidak hanya yang mendukung View Transitions.
-   Tombol lama dipasang ulang lewat penangkap klik di atas penangan lama, jadi kode lama tidak diubah.
+   Tiga cara (diatur terpisah untuk laptop dan HP di bagian PENGATURAN):
+     'pudar'    : tampilan lama memudar halus menjadi tampilan baru (View Transitions). Isi halaman kelihatan
+                  terus, tanpa layar kosong, dan animasinya dikerjakan GPU. Browser yang belum mendukung
+                  View Transitions otomatis langsung ganti.
+     'tirai'    : tirai berwarna menutup lalu membuka (ada layar polos sebentar).
+     'langsung' : langsung ganti, tanpa animasi.
+   Satu-satunya penangan klik tombol mode (penangan lama di bagian atas file sudah dihapus).
    ========================================================================== */
 (function () {
     'use strict';
@@ -934,18 +918,36 @@
     var btn = document.getElementById('themeSwitch');
     if (!btn) { return; }
 
+    /* ---------------- PENGATURAN ---------------- */
+    var CARA_LAPTOP = 'pudar';   // 'pudar' | 'tirai' | 'langsung'
+    var CARA_HP = 'pudar';       // 'pudar' | 'tirai' | 'langsung'
+
+    // true  = kalau perangkat meminta "kurangi animasi" (pengaturan Windows/Android), ganti mode langsung tanpa animasi.
+    // false = tetap memudar halus walau pengaturan itu aktif (pudar silang tidak menggerakkan apa pun, hanya memudar).
+    // Kalau di perangkatmu transisinya tidak muncul sama sekali, kemungkinan besar pengaturan itu aktif: coba ubah ke false.
+    var IKUTI_KURANGI_ANIMASI = true;
+
+    // Khusus cara 'tirai' (milidetik, makin kecil makin cepat).
+    var FADE_IN = 120;    // lama tirai menutup halaman sebelum tema diganti
+    var FADE_OUT = 280;   // lama tirai membuka lagi menampakkan tema baru
+    /* -------------------------------------------- */
+
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var busy = false;
-    // Dua angka ini SATU-SATUNYA yang perlu diubah untuk mengatur kecepatan (dipasang ke tirai lewat JS,
-    // jadi tidak ada angka kembar di CSS yang bisa selisih). Makin kecil = makin cepat.
-    //   FADE_IN  : lama tirai menutup halaman sebelum tema diganti.
-    //   FADE_OUT : lama tirai membuka lagi menampakkan tema baru.
-    var FADE_IN = 120;    // ms
-    var FADE_OUT = 280;   // ms
-    // true  = di HP (layar 720px ke bawah atau layar sentuh) tema langsung berganti, TANPA tirai.
-    // false = HP juga memakai tirai seperti laptop.
-    var INSTAN_DI_HP = true;
     var phone = window.matchMedia ? window.matchMedia('(max-width: 720px), (pointer: coarse)') : { matches: false };
+    var busy = false;
+
+    // Transisi yang dibatalkan browser (mis. klik link ke file unduhan atau halaman tanpa animasi pindah halaman)
+    // tidak merusak apa-apa, tapi tanpa ini Console menampilkan error merah. Di sini pembatalannya "ditangkap".
+    var diam = function () {};
+    // Di halaman tujuan, transisi yang dibatalkan melapor lewat promise tanpa penangan. Hanya error jenis ini yang disaring.
+    window.addEventListener('unhandledrejection', function (e) {
+        var r = e.reason;
+        if (r && r.name === 'InvalidStateError' && /transition/i.test(r.message || '')) { e.preventDefault(); }
+    });
+    window.addEventListener('pageswap', function (e) {
+        var vt = e.viewTransition;
+        if (vt) { vt.ready.catch(diam); vt.finished.catch(diam); vt.updateCallbackDone.catch(diam); }
+    });
 
     function apply(next) {
         html.setAttribute('data-theme', next);
@@ -953,7 +955,7 @@
         btn.setAttribute('aria-checked', next === 'dark' ? 'true' : 'false');
     }
 
-    // Ganti langsung: transisi per-elemen dimatikan sebentar supaya semuanya berganti serentak dalam satu frame.
+    // Langsung: transisi per-elemen dimatikan sebentar supaya semuanya berganti serentak dalam satu frame.
     function instan(next) {
         html.classList.add('theme-switching');
         apply(next);
@@ -962,18 +964,31 @@
         });
     }
 
-    document.addEventListener('click', function (e) {
-        var t = e.target;
-        if (!t || !t.closest || !t.closest('#themeSwitch')) { return; }
+    // Pudar silang: browser memotret tampilan lama, tema diganti, lalu keduanya dipudarkan (lama 0,3 detik di app.css).
+    function pudar(next) {
+        if (!document.startViewTransition) { instan(next); return; }
+        busy = true;
+        var selesai = function () { html.classList.remove('theme-switching'); busy = false; };
+        try {
+            var vt = document.startViewTransition(function () {
+                // Class dipasang BERSAMAAN dengan tema baru (satu kali hitung ulang gaya seluruh halaman), bukan sebelum
+                // transisi. Dulu dipasang lebih dulu, jadi browser menghitung ulang semua elemen dua kali sebelum
+                // sempat memotret tampilan lama, dan pudarnya telat mulai. Class ini mematikan transisi per-elemen,
+                // menjeda animasi latar, dan memberi durasi pudar 0,3 detik (glass.css).
+                html.classList.add('theme-switching');
+                apply(next);
+            });
+            vt.ready.catch(diam); vt.updateCallbackDone.catch(diam);
+            vt.finished.then(selesai, selesai);
+            setTimeout(selesai, 2500);           // pengaman kalau browser tidak pernah menyelesaikan transisinya
+        } catch (e) {
+            selesai();
+            instan(next);
+        }
+    }
 
-        // Hentikan penangan lama (View Transitions) supaya tidak jalan dua kali.
-        e.stopImmediatePropagation();
-        e.preventDefault();
-        if (busy) { return; }
-
-        var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        if (reduce || (INSTAN_DI_HP && phone.matches)) { instan(next); return; }
-
+    // Tirai: tirai berwarna tema tujuan memudar masuk, tema diganti di baliknya, lalu tirai memudar keluar.
+    function tirai(next) {
         busy = true;
         var veil = document.createElement('div');
         veil.className = 'theme-veil';
@@ -989,7 +1004,7 @@
             if (swapped) { return; }
             swapped = true;
             // Halaman sudah tertutup penuh: aman mengganti tema di sini.
-            html.classList.add('theme-switching');   // matikan transisi per-elemen selama pergantian
+            html.classList.add('theme-switching');
             apply(next);
             // Tunggu 2 frame supaya tampilan baru sudah digambar sebelum tirai dibuka.
             requestAnimationFrame(function () {
@@ -1004,12 +1019,28 @@
                 });
             });
         }
-        // Ganti tema TEPAT saat tirai benar-benar sudah penuh (event transitionend), bukan menebak lewat timer:
-        // kalau frame pertama tirai telat digambar, animasinya ikut telat dan timer saja bisa mengganti tema
-        // saat tirai baru separuh jadi. Timer di bawah hanya cadangan kalau event itu tidak datang.
+        // Ganti tema TEPAT saat tirai benar-benar sudah penuh (event transitionend), bukan menebak lewat timer.
+        // Timer di bawah hanya cadangan kalau event itu tidak datang.
         veil.addEventListener('transitionend', function (ev) {
             if (ev.target === veil && ev.propertyName === 'opacity') { swap(); }
         });
         setTimeout(swap, FADE_IN + 150);
+    }
+
+    document.addEventListener('click', function (e) {
+        var t = e.target;
+        if (!t || !t.closest || !t.closest('#themeSwitch')) { return; }
+
+        // Semua cara diurus di sini.
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        if (busy) { return; }
+
+        var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        var cara = phone.matches ? CARA_HP : CARA_LAPTOP;
+
+        if ((IKUTI_KURANGI_ANIMASI && reduce) || cara === 'langsung') { instan(next); return; }
+        if (cara === 'tirai') { tirai(next); return; }
+        pudar(next);
     }, true);
 })();

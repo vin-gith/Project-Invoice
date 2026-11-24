@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BusinessProfileController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TemplateInvoiceController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,12 @@ Route::post('lupa-password', [PasswordResetController::class, 'sendCode'])->midd
 Route::get('atur-ulang-password', [PasswordResetController::class, 'showReset'])->name('password.reset');
 Route::post('atur-ulang-password', [PasswordResetController::class, 'reset'])->middleware('throttle:10,1')->name('password.update');
 
+// PDF invoice untuk pelanggan (link di pesan WhatsApp). Tanpa login, tapi alamatnya ditandatangani dan kedaluwarsa
+// (middleware "signed"), jadi tidak bisa ditebak atau diganti ke invoice lain. Maks 30 kali per menit per IP.
+Route::get('invoice/{invoice}/lihat', [InvoiceController::class, 'publicPdf'])
+    ->middleware(['signed', 'throttle:30,1'])
+    ->name('invoices.public');
+
 // Semua halaman di dalam grup ini wajib login. Kalau belum, Laravel
 // mengarahkan ke route bernama "login" dan mengingat halaman yang dituju.
 Route::middleware('auth')->group(function () {
@@ -44,7 +51,11 @@ Route::middleware('auth')->group(function () {
     Route::put('template-invoice', [TemplateInvoiceController::class, 'update'])->name('template.update');
     Route::get('template-invoice/pratinjau', [TemplateInvoiceController::class, 'preview'])->middleware('throttle:60,1')->name('template.preview');
 
+    Route::get('laporan', [ReportController::class, 'index'])->name('reports.index');
+
     Route::get('invoices/suggest', [InvoiceController::class, 'suggest'])->name('invoices.suggest');
+    Route::get('invoices/{invoice}/whatsapp', [InvoiceController::class, 'whatsapp'])->name('invoices.whatsapp');
+    Route::post('invoices/{invoice}/duplikat', [InvoiceController::class, 'duplicate'])->name('invoices.duplicate');
     Route::get('invoices/{invoice}/logo', [InvoiceController::class, 'logo'])->name('invoices.logo');
     Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
     Route::get('invoices/{invoice}/cetak', [InvoiceController::class, 'print'])->name('invoices.print');

@@ -58,9 +58,10 @@
             <a style="--i:2" href="{{ route('invoices.create') }}" class="{{ request()->routeIs('invoices.create') ? 'is-current' : '' }}">Buat invoice</a>
             <a style="--i:3" href="{{ route('invoices.index', ['status' => 'unpaid']) }}" class="{{ request('status') === 'unpaid' ? 'is-current' : '' }}">Belum lunas</a>
             <a style="--i:4" href="{{ route('invoices.index', ['status' => 'paid']) }}" class="{{ request('status') === 'paid' ? 'is-current' : '' }}">Lunas</a>
-            <a style="--i:5" href="{{ route('business.edit') }}" class="{{ request()->routeIs('business.*') ? 'is-current' : '' }}">Data usaha</a>
-            <a style="--i:6" href="{{ route('template.edit') }}" class="{{ request()->routeIs('template.*') ? 'is-current' : '' }}">Template invoice</a>
-            <p class="drawer-foot" translate="no" style="--i:7">{{ \App\Models\BusinessProfile::current()->name }}</p>
+            <a style="--i:5" href="{{ route('reports.index') }}" class="{{ request()->routeIs('reports.*') ? 'is-current' : '' }}">Laporan</a>
+            <a style="--i:6" href="{{ route('business.edit') }}" class="{{ request()->routeIs('business.*') ? 'is-current' : '' }}">Data usaha</a>
+            <a style="--i:7" href="{{ route('template.edit') }}" class="{{ request()->routeIs('template.*') ? 'is-current' : '' }}">Template invoice</a>
+            <p class="drawer-foot" translate="no" style="--i:8">{{ \App\Models\BusinessProfile::current()->name }}</p>
         </nav>
     @endauth
 

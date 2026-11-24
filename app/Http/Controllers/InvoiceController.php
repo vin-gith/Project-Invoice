@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Support\InvoicePdf;
 use App\Support\Phone;
+use App\Support\WhatsApp;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
@@ -230,7 +231,7 @@ class InvoiceController extends Controller
             $override['pdf_template'] = $template;
         }
 
-        return $this->makePdf($invoice, $override)->download($invoice->number . '.pdf');
+        return InvoicePdf::make($invoice, $override)->download($invoice->number . '.pdf');
     }
 
     /**
@@ -241,7 +242,74 @@ class InvoiceController extends Controller
     {
         $this->authorizeOwner($invoice);
 
-        return $this->makePdf($invoice)->stream($invoice->number . '.pdf');
+        return InvoicePdf::make($invoice)->stream($invoice->number . '.pdf');
+    }
+
+    /**
+     * PDF untuk pelanggan, dibuka dari link di pesan WhatsApp. Tanpa login: route ini dijaga middleware "signed"
+     * (alamat ditandatangani dan kedaluwarsa, lihat WhatsApp::pdfUrl), jadi hanya link asli yang bisa membukanya.
+     */
+    public function publicPdf(Invoice $invoice)
+    {
+        return InvoicePdf::make($invoice)
+            ->stream($invoice->number . '.pdf')
+            ->header('X-Robots-Tag', 'noindex, nofollow');
+    }
+
+    /** Buka WhatsApp dengan pesan invoice yang sudah terisi. Link PDF di dalamnya dibuat saat tombol ditekan. */
+    public function whatsapp(Invoice $invoice): RedirectResponse
+    {
+        $this->authorizeOwner($invoice);
+
+        return redirect()->away(WhatsApp::invoiceLink($invoice));
+    }
+
+    /**
+     * Salin invoice jadi invoice baru: penagih, pelanggan, item, pajak, dan catatan ikut; nomor baru, status belum lunas,
+     * tanggal terbit hari ini, dan jatuh tempo dengan lama tempo yang sama. Langsung dibuka di form ubah untuk diperiksa.
+     */
+    public function duplicate(Invoice $invoice): RedirectResponse
+    {
+        $this->authorizeOwner($invoice);
+
+        $invoice->load('items');
+
+        $copy = DB::transaction(function () use ($invoice) {
+            $term = (int) abs($invoice->issue_date->diffInDays($invoice->due_date));
+
+            $copy = $invoice->replicate(['number', 'status', 'paid_at', 'seller_logo_path']);
+            $copy->forceFill([
+                'number' => Invoice::nextNumber((int) Auth::id()),
+                'status' => 'unpaid',
+                'paid_at' => null,
+                'issue_date' => today(),
+                'due_date' => today()->addDays($term),
+                'seller_logo_path' => $this->copyLogo($invoice->seller_logo_path),
+            ])->save();
+
+            $copy->items()->saveMany($invoice->items->map(fn (InvoiceItem $item) => $item->replicate(['invoice_id'])));
+            $copy->recalculate();
+
+            return $copy;
+        });
+
+        return redirect()
+            ->route('invoices.edit', $copy)
+            ->with('success', "Invoice {$copy->number} dibuat dari salinan {$invoice->number}. Periksa lalu simpan.");
+    }
+
+    /** Tiap invoice punya file logo sendiri, jadi salinan juga mendapat salinan file logonya. */
+    private function copyLogo(?string $path): ?string
+    {
+        $disk = Storage::disk('local');
+        if (! $path || ! $disk->exists($path)) {
+            return null;
+        }
+
+        $copy = 'invoice-logos/' . Auth::id() . '-' . Str::random(10) . '.' . (pathinfo($path, PATHINFO_EXTENSION) ?: 'png');
+        $disk->copy($path, $copy);
+
+        return $copy;
     }
 
     /** Menampilkan logo penagih milik invoice ini (untuk pratinjau di form ubah invoice). */
@@ -253,12 +321,6 @@ class InvoiceController extends Controller
         abort_unless($path && Storage::disk('local')->exists($path), 404);
 
         return Storage::disk('local')->response($path);
-    }
-
-    private function makePdf(Invoice $invoice, array $override = [])
-    {
-        // Dirakit di InvoicePdf supaya PDF di sini dan pratinjau "Template invoice" selalu sama.
-        return InvoicePdf::make($invoice, $override);
     }
     
     /**
@@ -294,15 +356,7 @@ class InvoiceController extends Controller
             return $own;
         }
 
-        $source = BusinessProfile::stored()?->logo_path;
-        if ($source && $disk->exists($source)) {
-            $copy = 'invoice-logos/' . Auth::id() . '-' . Str::random(10) . '.' . (pathinfo($source, PATHINFO_EXTENSION) ?: 'png');
-            $disk->copy($source, $copy);
-
-            return $copy;
-        }
-
-        return null;
+        return $this->copyLogo(BusinessProfile::stored()?->logo_path);
     }
 
     /** Invoice milik akun yang sedang login saja. */
