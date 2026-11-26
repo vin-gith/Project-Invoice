@@ -22,3 +22,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Pengaturan Claude Code di komputer ini (bukan bagian aplikasi)
+/.claude/
