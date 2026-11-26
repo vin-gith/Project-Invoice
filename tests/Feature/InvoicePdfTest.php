@@ -40,6 +40,23 @@ class InvoicePdfTest extends TestCase
         return $invoice;
     }
 
+    public function test_large_logo_is_shrunk_for_pdf(): void
+    {
+        if (! function_exists('imagecreatetruecolor')) {
+            $this->markTestSkipped('Ekstensi GD tidak aktif.');
+        }
+        Storage::fake('local');
+        $img = imagecreatetruecolor(1200, 900);
+        ob_start();
+        imagepng($img);
+        Storage::disk('local')->put('logos/besar.png', ob_get_clean());
+
+        $uri = \App\Support\LogoImage::dataUri('logos/besar.png');
+        [$w, $h] = getimagesizefromstring(base64_decode(substr($uri, strpos($uri, ',') + 1)));
+
+        $this->assertSame([400, 300], [$w, $h]);
+    }
+
     public function test_download_print_and_preview_work_with_transparent_png_logo(): void
     {
         Storage::fake('local');
@@ -52,7 +69,9 @@ class InvoicePdfTest extends TestCase
         $this->actingAs($user)->get("/invoices/{$invoice->id}/cetak")
             ->assertOk()->assertHeader('content-type', 'application/pdf');
 
-        $this->actingAs($user)->get("/template-invoice/pratinjau?invoice={$invoice->id}")
+        $preview = $this->actingAs($user)->get("/template-invoice/pratinjau?invoice={$invoice->id}")
             ->assertOk()->assertHeader('content-type', 'application/pdf');
+        // Tanpa ukuran ini, pratinjau lewat link port forwarding VS Code menunggu sampai kehabisan waktu.
+        $preview->assertHeader('Content-Length', (string) strlen($preview->getContent()));
     }
 }

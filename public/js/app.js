@@ -1044,3 +1044,37 @@
         pudar(next);
     }, true);
 })();
+
+/* ==========================================================================
+   LIQUID GLASS v2: kilap yang mengikuti kursor di kartu kaca kecil (pasangan blok di glass.css).
+   Hanya untuk mouse, dan mati kalau pengguna meminta "kurangi animasi". Satu pendengar untuk seluruh halaman,
+   posisi ditulis paling banyak sekali per frame.
+   ========================================================================== */
+(function () {
+    'use strict';
+
+    if (!window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) { return; }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { return; }
+
+    var SEL = '.stat, .feature, .join, .side, .auth-card, .cta';
+    var target = null;
+    var x = 0;
+    var y = 0;
+    var queued = false;
+
+    function paint() {
+        queued = false;
+        if (!target) { return; }
+        var r = target.getBoundingClientRect();
+        target.style.setProperty('--mx', Math.round(x - r.left) + 'px');
+        target.style.setProperty('--my', Math.round(y - r.top) + 'px');
+    }
+
+    document.addEventListener('pointermove', function (e) {
+        target = e.target && e.target.closest ? e.target.closest(SEL) : null;
+        if (!target) { return; }
+        x = e.clientX;
+        y = e.clientY;
+        if (!queued) { queued = true; requestAnimationFrame(paint); }
+    }, { passive: true });
+})();

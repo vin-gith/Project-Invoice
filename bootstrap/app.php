@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -24,5 +26,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectUsersTo(fn () => route('invoices.index'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // 419 = token form sudah basi (halaman dibiarkan terbuka lebih dari 2 jam, atau dibuka lagi lewat tombol Back
+        // setelah keluar). Daripada layar "419 PAGE EXPIRED", kembali ke form dengan isian tetap ada (kecuali password)
+        // dan token baru, jadi cukup tekan kirim sekali lagi.
+        $exceptions->render(function (HttpException $e, Request $request) {
+            if ($e->getStatusCode() !== 419 || $request->expectsJson()) {
+                return null;
+            }
+
+            return back()
+                ->withInput($request->except(['password', 'password_confirmation', '_token']))
+                ->withErrors(['expired' => 'Halaman sudah kedaluwarsa. Silakan kirim ulang.']);
+        });
     })->create();

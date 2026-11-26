@@ -30,7 +30,44 @@ class LogoImage
             return null;
         }
 
+        // Di PDF logo cuma setinggi ±1,5 cm. Logo besar (misalnya 1254 px, ±1 MB) dulu menambah ±3 detik dan ±1 MB
+        // di setiap PDF, sampai pratinjau lewat link tunnel kehabisan waktu. Diperkecil dulu, sisi terpanjang 400 px.
+        $binary = self::shrink($binary, $mime, 400) ?? $binary;
+
         return 'data:' . $mime . ';base64,' . base64_encode($binary);
+    }
+
+    /** Perkecil gambar supaya sisi terpanjangnya $max px (proporsi dan transparansi tetap). Null kalau tidak perlu atau tidak bisa. */
+    private static function shrink(string $binary, string $mime, int $max): ?string
+    {
+        if (! function_exists('imagecreatefromstring') || ! in_array($mime, ['image/png', 'image/jpeg'], true)) {
+            return null;
+        }
+        $size = @getimagesizefromstring($binary);
+        if (! $size || max($size[0], $size[1]) <= $max || ! ($src = @imagecreatefromstring($binary))) {
+            return null;
+        }
+
+        $scale = $max / max($size[0], $size[1]);
+        $w = max(1, (int) round($size[0] * $scale));
+        $h = max(1, (int) round($size[1] * $scale));
+        // Transparansi hanya disimpan kalau aslinya transparan: PNG transparan diproses dompdf per piksel (lebih lambat).
+        $alpha = $mime === 'image/png' && (in_array(ord($binary[25] ?? "\0"), [4, 6], true) || str_contains($binary, 'tRNS'));
+
+        $dst = imagecreatetruecolor($w, $h);
+        if ($alpha) {
+            imagealphablending($dst, false);
+            imagesavealpha($dst, true);
+        }
+        imagecopyresampled($dst, $src, 0, 0, 0, 0, $w, $h, $size[0], $size[1]);
+
+        ob_start();
+        $mime === 'image/png' ? imagepng($dst, null, 6) : imagejpeg($dst, null, 88);
+        $out = ob_get_clean();
+        imagedestroy($src);
+        imagedestroy($dst);
+
+        return $out ?: null;
     }
 
     /** Logo versi pudar (untuk watermark di tengah halaman) sebagai data URI PNG persegi. */

@@ -27,6 +27,8 @@
     --accent-hover: #4733cf;
     --accent-contrast: #ffffff;
     --accent-soft: rgba(91, 70, 230, 0.14);
+    /* Teks aksen kecil yang menempel langsung di latar (label section): --accent cuma 2,8:1 di atas bulatan ungu. */
+    --accent-text: #33249e;
     --accent-2: #14a68c;
 
     --danger: #b3203c;
@@ -86,10 +88,11 @@
     --surface: rgba(255, 255, 255, 0.1);
     --surface-2: rgba(255, 255, 255, 0.07);
     --text: #f1effb;
-    --muted: #aaa8c4;
+    --muted: #bcbad4;   /* dulu #aaa8c4: 4,0:1 di bagian kaca yang paling terang, sekarang 4,9:1 */
     --line: rgba(255, 255, 255, 0.12);
 
     --accent: #b4a8ff;
+    --accent-text: #b4a8ff;
     --accent-hover: #cdc4ff;
     --accent-contrast: #140e3a;
     --accent-soft: rgba(180, 168, 255, 0.18);
@@ -404,6 +407,7 @@ input[type="file"] { border: 1px dashed var(--field-edge); border-radius: 20px; 
 }
 @keyframes glassShine { to { background-position: 100% 0; } }
 
+.l-eyebrow { color: var(--accent-text); }
 .blob-a { background: color-mix(in srgb, var(--accent) 34%, transparent); }
 .blob-b { background: color-mix(in srgb, var(--accent-2) 30%, transparent); }
 
@@ -825,4 +829,77 @@ html.refract[data-theme="light"] .topbar {
         html.theme-switching::view-transition-old(root),
         html.theme-switching::view-transition-new(root) { animation-duration: 0.3s; }
     }
+}
+
+/* ==========================================================================
+   LIQUID GLASS v2: tepi berkilau, kilap yang mengikuti kursor, dan butiran halus.
+   Untuk membatalkan: hapus dari komentar ini sampai akhir file (dan blok "LIQUID GLASS v2" di app.js).
+   ========================================================================== */
+:root, [data-theme="light"] {
+    /* Tepi kaca: terang di kiri atas (kena cahaya), hilang di tengah, menyala tipis lagi di kanan bawah. */
+    --rim: linear-gradient(160deg, #fff 0%, rgba(255, 255, 255, 0.55) 18%, rgba(255, 255, 255, 0.06) 45%, rgba(255, 255, 255, 0) 62%, rgba(255, 255, 255, 0.45) 100%);
+    --edge-soft: rgba(255, 255, 255, 0.5);
+    --spec: rgba(255, 255, 255, 0.5);
+}
+[data-theme="dark"] {
+    --rim: linear-gradient(160deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.16) 20%, rgba(255, 255, 255, 0) 50%, rgba(180, 168, 255, 0.06) 75%, rgba(180, 168, 255, 0.32) 100%);
+    --edge-soft: rgba(255, 255, 255, 0.07);
+    --spec: rgba(190, 180, 255, 0.1);
+}
+
+/* 1. Tepi berkilau: garis gradasi 1px di dalam tepi (trik mask), garis solid lama dibuat samar.
+   :where() = tanpa bobot, jadi kartu yang sudah sticky (panel samping, pratinjau template) tetap sticky. */
+:where(.card) { position: relative; }
+.card, .cta, .modal-box, .toast { border-color: var(--edge-soft); }
+.card::after,
+.cta::after,
+.modal-box::after,
+.toast::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--rim);
+    pointer-events: none;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+
+/* 2. Kilap yang mengikuti kursor (posisi --mx/--my dari app.js). Hanya kartu kecil dan hanya untuk mouse;
+   kartu tabel yang besar sengaja tidak, supaya geser mouse tidak menghitung ulang ratusan baris. */
+@media (hover: hover) and (pointer: fine) {
+    .stat, .feature, .join, .side, .auth-card, .cta { isolation: isolate; }
+    .stat::before,
+    .feature::before,
+    .join::before,
+    .side::before,
+    .auth-card::before,
+    .cta::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;   /* di atas isi kaca, di bawah tulisan */
+        border-radius: inherit;
+        background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 0%), var(--spec), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.35s ease;
+        pointer-events: none;
+    }
+    .stat:hover::before,
+    .feature:hover::before,
+    .join:hover::before,
+    .side:hover::before,
+    .auth-card:hover::before,
+    .cta:hover::before { opacity: 1; }
+}
+
+/* 3. Butiran halus di lapisan bulatan latar: gradasi tidak belang dan kaca terasa seperti bahan nyata.
+   Abu-abu 50% di mode "overlay" = tidak mengubah warna, jadi hanya teksturnya yang terlihat. Digambar sekali, tidak per frame. */
+body::before {
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='.35' intercept='.33'/%3E%3CfeFuncG type='linear' slope='.35' intercept='.33'/%3E%3CfeFuncB type='linear' slope='.35' intercept='.33'/%3E%3CfeFuncA type='linear' slope='0' intercept='1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 180px 180px,
+        var(--orbs-a);
+    background-blend-mode: overlay, normal, normal, normal;
 }

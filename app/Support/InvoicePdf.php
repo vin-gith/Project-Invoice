@@ -29,7 +29,11 @@ class InvoicePdf
         $design['logo'] = LogoImage::dataUri($logoPath);
         $design['watermark'] = LogoImage::watermark($logoPath);
 
-        return Pdf::loadView('invoices.pdf', compact('invoice', 'design'))->setPaper('a4');
+        // Subset font: hanya huruf yang dipakai yang ditanam. PDF tanpa logo turun dari ±1,2 MB jadi ±32 KB,
+        // penting saat dibuka lewat link tunnel (pratinjau template dikirim ulang tiap pilihan berubah).
+        return Pdf::loadView('invoices.pdf', compact('invoice', 'design'))
+            ->setPaper('a4')
+            ->setOption('isFontSubsettingEnabled', true);
     }
 
     /** Invoice karangan (tidak disimpan ke database) untuk contoh tampilan saat akun belum punya invoice. */

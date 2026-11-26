@@ -100,6 +100,22 @@ class AuthTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_expired_form_goes_back_with_input_instead_of_419_page(): void
+    {
+        // Saat test, pemeriksaan token CSRF dilewati Laravel, jadi token basi disimulasikan langsung.
+        \Illuminate\Support\Facades\Route::post('/_kedaluwarsa', fn () => throw new \Illuminate\Session\TokenMismatchException())
+            ->middleware('web');
+
+        $this->from('/login')
+            ->post('/_kedaluwarsa', ['email' => 'budi@example.com', 'password' => 'Rahasia#123'])
+            ->assertRedirect('/login')
+            ->assertSessionHasErrors('expired')
+            ->assertSessionHasInput('email', 'budi@example.com')
+            ->assertSessionMissing('_old_input.password');
+
+        $this->postJson('/_kedaluwarsa')->assertStatus(419);
+    }
+
     public function test_invoice_pages_require_login(): void
     {
         $this->get('/invoices')->assertRedirect(route('login'));
