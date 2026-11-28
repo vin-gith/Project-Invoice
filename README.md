@@ -103,6 +103,39 @@ Things already handled for tunnels:
 `php artisan serve` handles one request at a time on Windows, so it is fine for a demo but not for
 real traffic.
 
+## Deploying to production
+
+Do these before the app goes public. The local `.env` is for development and keeps debug on, so set
+these on the server's own `.env`, not on your computer.
+
+1. Set the environment for production:
+
+   ```ini
+   APP_ENV=production
+   APP_DEBUG=false
+   APP_URL=https://your-domain.com
+   LOG_LEVEL=warning
+   SESSION_SECURE_COOKIE=true
+   ```
+
+   `APP_DEBUG=true` on a public server shows error pages that can reveal the database password and
+   `APP_KEY`.
+2. Serve the app with Nginx or Apache and PHP-FPM over HTTPS, with the document root set to `public/`.
+   Do not use `php artisan serve` in production.
+3. If the server sits behind a proxy or CDN (for example Cloudflare or a load balancer), add its IP
+   addresses to `trustProxies` in `bootstrap/app.php`.
+4. Install and prepare the app on the server:
+
+   ```bash
+   composer install --no-dev --optimize-autoloader
+   php artisan migrate --force
+   php artisan optimize
+   ```
+
+5. Configure a working SMTP account in `MAIL_...`, because password reset codes are sent by email.
+6. Back up the database and `storage/app/private` (uploaded logos) regularly.
+7. Run `composer audit` from time to time and update packages when it reports a vulnerability.
+
 ## Running the tests
 
 ```bash

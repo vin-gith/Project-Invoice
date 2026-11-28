@@ -6,7 +6,7 @@
 
 /* Warna batang: diuji (validator dataviz) terhadap permukaan kartu terang dan gelap.
    Mode gelap memakai satu langkah lebih gelap dari --accent supaya batang tidak terlalu menyala. */
-:root { --chart-bar: #5b46e6; }
+:root { --chart-bar: #5b4bd6; }
 [data-theme="dark"] { --chart-bar: #8f7af0; }
 
 .stat-sub { display: block; margin-top: 4px; color: var(--muted); font-size: 0.8rem; }

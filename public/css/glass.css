@@ -16,20 +16,18 @@
 /* ---------- Palet: terang ---------- */
 :root,
 [data-theme="light"] {
-    --bg: #ece4dd;
+    --bg: #ebe5de;
     --surface: rgba(255, 255, 255, 0.5);
     --surface-2: rgba(255, 255, 255, 0.26);
-    --text: #1d1a2e;
-    --muted: #424560;
-    --line: rgba(80, 66, 140, 0.16);
+    --text: #1d1b26;
+    --muted: #4a4757;
+    --line: rgba(90, 80, 120, 0.14);
 
-    --accent: #5b46e6;
-    --accent-hover: #4733cf;
+    --accent: #5b4bd6;
+    --accent-hover: #4f40c4;
     --accent-contrast: #ffffff;
-    --accent-soft: rgba(91, 70, 230, 0.14);
-    /* Teks aksen kecil yang menempel langsung di latar (label section): --accent cuma 2,8:1 di atas bulatan ungu. */
-    --accent-text: #33249e;
-    --accent-2: #14a68c;
+    --accent-soft: rgba(111, 93, 233, 0.14);
+    --accent-2: #2f9e8a;
 
     --danger: #b3203c;
     --danger-soft: rgba(224, 54, 79, 0.12);
@@ -40,19 +38,18 @@
     --overdue-bg: rgba(255, 100, 128, 0.22);
     --overdue: #a31f3b;
 
-    --shadow: 0 10px 34px rgba(96, 76, 180, 0.14), 0 2px 6px rgba(96, 76, 180, 0.07);
-    --shadow-lg: 0 30px 70px rgba(70, 50, 150, 0.26), 0 8px 20px rgba(70, 50, 150, 0.1);
+    --shadow: 0 22px 44px -16px rgba(70, 60, 100, 0.3), 0 3px 8px rgba(70, 60, 100, 0.07);
+    --shadow-lg: 0 30px 70px rgba(70, 55, 120, 0.26), 0 8px 20px rgba(70, 55, 120, 0.1);
 
     --glass-fill:
-        radial-gradient(130% 100% at 0% 0%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 55%),
-        linear-gradient(160deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.07));
+        linear-gradient(165deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.36));
     --glass-base: rgba(255, 255, 255, 0.2);
     --bar-fill: rgba(255, 255, 255, 0.86);
     --glass-pop: rgba(255, 255, 255, 0.44);
     --glass-edge: rgba(255, 255, 255, 0.88);
-    --glass-glow: inset 0 -18px 30px -22px rgba(120, 100, 255, 0.45);
+    --glass-glow: inset 0 -14px 22px -16px rgba(110, 100, 150, 0.3);
     --glass-in:
-        inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+        inset 0 2px 1px rgba(255, 255, 255, 0.95),
         inset 1px 0 0 rgba(255, 255, 255, 0.55),
         inset 0 -1px 0 rgba(255, 255, 255, 0.35),
         inset -1px 0 0 rgba(255, 255, 255, 0.2);
@@ -62,24 +59,38 @@
 
     --field-bg: rgba(255, 255, 255, 0.4);
     --field-edge: rgba(255, 255, 255, 0.9);
-    --field-in: inset 0 2px 5px rgba(96, 76, 180, 0.1);
+    --field-in: inset 0 2px 4px rgba(70, 60, 100, 0.08);
+    /* Kolom isian: pill putih, garis 3,1:1 terhadap kaca kartu supaya batasnya terlihat (WCAG 1.4.11). */
+    --input-edge: #857f9f;
+    --input-bg: rgba(255, 255, 255, 0.85);
 
-    --btn-grad: linear-gradient(135deg, #7660f0 0%, #4e3ad8 100%);
-    --btn-glow: rgba(91, 70, 230, 0.38);
+    --btn-grad: linear-gradient(180deg, #6c5ae6 0%, #5a4ad6 100%);
+    --btn-glow: rgba(110, 90, 235, 0.5);
     --sheen: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.6) 50%, transparent 62%);
     --on-solid: #ffffff;
-    --grad-text: linear-gradient(100deg, #5b46e6 0%, #0b8f7a 55%, #d6407a 100%);
+    --grad-text: linear-gradient(100deg, #6d5ce6 0%, #7a62dc 45%, #18806d 100%);
     --band: rgba(255, 255, 255, 0.26);
+
+    /* Pill putih timbul (tombol kedua, tombol ikon di navbar, sorotan link aktif). */
+    --chip-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.7));
+    --chip-edge: #ffffff;
+    --chip-shadow: inset 0 2px 1px #ffffff, inset 0 -4px 8px rgba(110, 100, 150, 0.14), 0 12px 22px -10px rgba(60, 55, 85, 0.35);
+    /* Kaca mint (Tandai lunas): teks 5,7:1 di bagian paling gelap. */
+    --mint-bg: linear-gradient(180deg, #b3eedf 0%, #7fd8c3 100%);
+    --mint-text: #0b4f42;
+    --mint-edge: rgba(255, 255, 255, 0.6);
+    --mint-shadow: inset 0 2px 1px rgba(255, 255, 255, 0.7), inset 0 -4px 8px rgba(20, 120, 100, 0.25), 0 12px 22px -8px rgba(60, 190, 160, 0.55);
+    /* Kartu iridescent pink, lavender, mint. */
+    --iri: linear-gradient(135deg, rgba(252, 208, 222, 0.92) 0%, rgba(210, 196, 255, 0.92) 50%, rgba(170, 232, 220, 0.92) 100%);
 
     /* Latar: dasar berwarna + bulatan warna besar. Dua lapis supaya bisa bergerak berlawanan arah. */
     --orbs-a:
-        radial-gradient(circle 46vmax at 20% 22%, rgba(140, 118, 255, 0.7), transparent 70%),
-        radial-gradient(circle 42vmax at 80% 80%, rgba(80, 214, 194, 0.6), transparent 70%),
-        linear-gradient(155deg, #f5eee8 0%, #eee5f0 50%, #e5ebf4 100%);
+        radial-gradient(circle 40vmax at 12% 18%, rgba(196, 182, 250, 0.38), transparent 70%),
+        radial-gradient(circle 38vmax at 88% 86%, rgba(168, 228, 214, 0.34), transparent 70%),
+        linear-gradient(160deg, #f4efe9 0%, #ece6df 55%, #e3ddd7 100%);
     --orbs-b:
-        radial-gradient(circle 38vmax at 82% 20%, rgba(255, 158, 190, 0.6), transparent 70%),
-        radial-gradient(circle 36vmax at 18% 80%, rgba(120, 165, 255, 0.5), transparent 70%),
-        radial-gradient(circle 26vmax at 52% 52%, rgba(255, 214, 170, 0.35), transparent 70%);
+        linear-gradient(118deg, transparent 52%, rgba(55, 50, 70, 0.1) 70%, rgba(55, 50, 70, 0.04) 84%, transparent 92%),
+        radial-gradient(circle 30vmax at 70% 30%, rgba(250, 205, 222, 0.22), transparent 70%);
 }
 
 /* ---------- Palet: gelap ---------- */
@@ -88,11 +99,10 @@
     --surface: rgba(255, 255, 255, 0.1);
     --surface-2: rgba(255, 255, 255, 0.07);
     --text: #f1effb;
-    --muted: #bcbad4;   /* dulu #aaa8c4: 4,0:1 di bagian kaca yang paling terang, sekarang 4,9:1 */
+    --muted: #bcbad4;   /* 4,9:1 di bagian kaca yang paling terang */
     --line: rgba(255, 255, 255, 0.12);
 
     --accent: #b4a8ff;
-    --accent-text: #b4a8ff;
     --accent-hover: #cdc4ff;
     --accent-contrast: #140e3a;
     --accent-soft: rgba(180, 168, 255, 0.18);
@@ -116,7 +126,7 @@
     --glass-base: rgba(16, 12, 34, 0.3);
     --bar-fill: rgba(20, 15, 44, 0.88);
     --glass-pop: rgba(22, 17, 48, 0.5);
-    --glass-glow: inset 0 -18px 30px -22px rgba(150, 130, 255, 0.38);
+    --glass-glow: inset 0 -14px 22px -16px rgba(150, 130, 255, 0.32);
     --glass-edge: rgba(255, 255, 255, 0.17);
     --glass-in:
         inset 0 1.5px 0 rgba(255, 255, 255, 0.3),
@@ -129,21 +139,32 @@
     --field-bg: rgba(255, 255, 255, 0.05);
     --field-edge: rgba(255, 255, 255, 0.16);
     --field-in: inset 0 2px 6px rgba(0, 0, 0, 0.35);
+    --input-edge: rgba(255, 255, 255, 0.16);
+    --input-bg: rgba(255, 255, 255, 0.05);
 
-    --btn-grad: linear-gradient(135deg, #cfc6ff 0%, #9382ff 100%);
+    --btn-grad: linear-gradient(180deg, #cfc6ff 0%, #9382ff 100%);
     --btn-glow: rgba(147, 130, 255, 0.45);
     --sheen: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.7) 50%, transparent 62%);
     --on-solid: #06241b;
     --grad-text: linear-gradient(100deg, #b4a8ff 0%, #6ff0d0 55%, #ff9ec4 100%);
     --band: rgba(255, 255, 255, 0.04);
 
+    --chip-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.05));
+    --chip-edge: rgba(255, 255, 255, 0.16);
+    --chip-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -4px 8px rgba(0, 0, 0, 0.25), 0 12px 22px -10px rgba(0, 0, 0, 0.6);
+    --mint-bg: linear-gradient(180deg, rgba(127, 216, 195, 0.3), rgba(127, 216, 195, 0.14));
+    --mint-text: #7ff0cb;
+    --mint-edge: rgba(127, 240, 203, 0.35);
+    --mint-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 12px 22px -10px rgba(60, 190, 160, 0.35);
+    --iri: linear-gradient(135deg, rgba(255, 158, 196, 0.2) 0%, rgba(180, 168, 255, 0.2) 50%, rgba(111, 240, 208, 0.2) 100%);
+
     --orbs-a:
-        radial-gradient(circle 46vmax at 20% 22%, rgba(118, 88, 255, 0.5), transparent 70%),
-        radial-gradient(circle 42vmax at 80% 80%, rgba(24, 196, 176, 0.32), transparent 70%),
-        linear-gradient(155deg, #0c0a18 0%, #110c22 50%, #09101e 100%);
+        radial-gradient(circle 40vmax at 12% 18%, rgba(118, 88, 255, 0.42), transparent 70%),
+        radial-gradient(circle 38vmax at 88% 86%, rgba(24, 196, 176, 0.24), transparent 70%),
+        linear-gradient(160deg, #0c0a18 0%, #110c22 55%, #09101e 100%);
     --orbs-b:
-        radial-gradient(circle 38vmax at 82% 20%, rgba(255, 80, 170, 0.26), transparent 70%),
-        radial-gradient(circle 36vmax at 18% 80%, rgba(60, 110, 255, 0.34), transparent 70%);
+        linear-gradient(118deg, transparent 52%, rgba(0, 0, 0, 0.28) 70%, rgba(0, 0, 0, 0.1) 84%, transparent 92%),
+        radial-gradient(circle 30vmax at 70% 30%, rgba(255, 80, 170, 0.16), transparent 70%);
 }
 
 /* ---------- Latar gradasi (semua halaman) ---------- */
@@ -189,10 +210,10 @@ body::after  { background: var(--orbs-b); animation: glassDriftB 38s ease-in-out
 }
 
 .menu-btn {
-    border: 1px solid var(--field-edge);
+    border: 1px solid var(--chip-edge);
     border-radius: 50%;
-    background: var(--field-bg);
-    box-shadow: var(--glass-in);
+    background: var(--chip-bg);
+    box-shadow: var(--chip-shadow);
 }
 .menu-btn:hover { border-color: var(--accent); }
 
@@ -204,7 +225,7 @@ body::after  { background: var(--orbs-b); animation: glassDriftB 38s ease-in-out
 /* ---------- Kartu ---------- */
 .card {
     border: 1px solid var(--glass-edge);
-    border-radius: 26px;
+    border-radius: 30px;
     background: var(--glass-fill);
     box-shadow: var(--shadow), var(--glass-in), var(--glass-glow);
     -webkit-backdrop-filter: var(--glass-blur);
@@ -214,6 +235,7 @@ body::after  { background: var(--orbs-b); animation: glassDriftB 38s ease-in-out
 .stat:hover,
 .feature:hover,
 .join:hover { box-shadow: var(--shadow-lg), 0 0 0 1px var(--accent-soft), var(--glass-in); }
+.join:first-child { background: var(--iri); }
 
 /* ---------- Tombol: kapsul ---------- */
 .btn { border-radius: 999px; padding: 10px 20px; }
@@ -233,28 +255,29 @@ body::after  { background: var(--orbs-b); animation: glassDriftB 38s ease-in-out
 }
 .btn-primary {
     background-position: -160% 0, 0 0;
-    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.55), inset 0 -3px 6px rgba(30, 10, 120, 0.22), 0 10px 24px var(--btn-glow);
+    box-shadow: inset 0 2px 1px rgba(255, 255, 255, 0.6), inset 0 -5px 10px rgba(50, 35, 150, 0.35), 0 14px 24px -8px var(--btn-glow), 0 3px 6px rgba(70, 50, 170, 0.18);
 }
 .btn-primary:hover {
     background-position: 160% 0, 0 0;
-    box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.6), inset 0 -3px 6px rgba(30, 10, 120, 0.22), 0 14px 30px var(--btn-glow);
+    box-shadow: inset 0 2px 1px rgba(255, 255, 255, 0.6), inset 0 -5px 10px rgba(50, 35, 150, 0.35), 0 18px 30px -8px var(--btn-glow), 0 3px 6px rgba(70, 50, 170, 0.18);
     transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, background-position 0.9s ease;
 }
 
-/* Sekunder: kaca bening. */
+/* Sekunder: pill putih timbul. */
 .btn-ghost {
-    background: var(--field-bg);
-    border-color: var(--field-edge);
-    box-shadow: var(--glass-in);
+    background: var(--chip-bg);
+    border-color: var(--chip-edge);
+    box-shadow: var(--chip-shadow);
 }
-.btn-ghost:hover { background: var(--surface); border-color: var(--accent); color: var(--accent); }
+/* --accent-hover: --accent di mode gelap cuma 4,4:1 di atas pill ini. */
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent-hover); }
 
-/* Tandai lunas: kaca hijau tosca. */
+/* Tandai lunas: kaca mint. */
 .btn-success {
-    background: var(--paid-bg);
-    color: var(--paid);
-    border-color: color-mix(in srgb, var(--paid) 45%, transparent);
-    box-shadow: var(--glass-in);
+    background: var(--mint-bg);
+    color: var(--mint-text);
+    border-color: var(--mint-edge);
+    box-shadow: var(--mint-shadow);
 }
 .btn-success:hover { background: var(--paid); color: var(--on-solid); border-color: var(--paid); }
 
@@ -264,7 +287,7 @@ body::after  { background: var(--orbs-b); animation: glassDriftB 38s ease-in-out
     border-color: rgba(255, 255, 255, 0.3);
     box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.4), 0 8px 20px rgba(217, 47, 76, 0.35);
 }
-.btn-danger-ghost { background: var(--field-bg); border-color: var(--field-edge); box-shadow: var(--glass-in); }
+.btn-danger-ghost { background: var(--chip-bg); border-color: var(--chip-edge); box-shadow: var(--chip-shadow); }
 
 .badge { border: 1px solid color-mix(in srgb, currentColor 28%, transparent); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35); }
 
@@ -295,9 +318,9 @@ body::after  { background: var(--orbs-b); animation: glassDriftB 38s ease-in-out
 /* ---------- Kolom isian ---------- */
 input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"], input[type="search"], textarea, select {
     padding-left: 18px;
-    border: 1px solid var(--field-edge);
+    border: 1px solid var(--input-edge);
     border-radius: 999px;
-    background: var(--field-bg);
+    background: var(--input-bg);
     box-shadow: var(--field-in);
 }
 textarea { border-radius: 20px; }
@@ -309,16 +332,16 @@ input:focus, textarea:focus, select:focus {
 input:user-invalid { border-color: var(--danger); }
 
 .phone-wrap {
-    border: 1px solid var(--field-edge);
+    border: 1px solid var(--input-edge);
     border-radius: 999px;
-    background: var(--field-bg);
+    background: var(--input-bg);
     box-shadow: var(--field-in);
 }
 .phone-wrap:focus-within { border-color: var(--accent); background: var(--surface); box-shadow: var(--field-in), 0 0 0 4px var(--accent-soft); }
 .phone-prefix { padding-left: 18px; }
 .phone-wrap input[type="text"] { border-radius: 0 999px 999px 0; }
 
-input[type="file"] { border: 1px dashed var(--field-edge); border-radius: 20px; background: var(--field-bg); }
+input[type="file"] { border: 1px dashed var(--input-edge); border-radius: 20px; background: var(--input-bg); }
 .alert { border-radius: 18px; }
 
 /* ---------- Form bertahap ---------- */
@@ -389,6 +412,23 @@ input[type="file"] { border: 1px dashed var(--field-edge); border-radius: 20px; 
 .opt { border: 1.5px solid var(--field-edge); border-radius: 22px; background: var(--field-bg); box-shadow: var(--glass-in); }
 .swatch { border: 1.5px solid var(--field-edge); background: var(--field-bg); box-shadow: var(--glass-in); }
 .logo-preview { border-color: var(--field-edge); border-radius: 18px; }
+/* Kotak logo selalu putih (seperti kertas invoice), jadi tulisannya abu gelap tetap di mode gelap: --muted gelap cuma 1,9:1 di sini. */
+.logo-preview .muted { color: #5b5870; }
+
+/* Tombol "Choose File" bawaan browser jadi pill timbul yang sama dengan tombol lain. */
+input[type="file"]::file-selector-button {
+    margin-right: 12px;
+    padding: 7px 14px;
+    border: 1px solid var(--chip-edge);
+    border-radius: 999px;
+    background: var(--chip-bg);
+    box-shadow: var(--chip-shadow);
+    color: var(--text);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+input[type="file"]::file-selector-button:hover { border-color: var(--accent); color: var(--accent-hover); }
 
 .tpl-biz { border: 1px solid var(--glass-edge); border-radius: 20px; background: var(--surface-2); box-shadow: var(--glass-in); }
 .tpl-stage { border: 1px solid var(--glass-edge); border-radius: 22px; background: var(--surface-2); box-shadow: var(--glass-in); }
@@ -407,7 +447,6 @@ input[type="file"] { border: 1px dashed var(--field-edge); border-radius: 20px; 
 }
 @keyframes glassShine { to { background-position: 100% 0; } }
 
-.l-eyebrow { color: var(--accent-text); }
 .blob-a { background: color-mix(in srgb, var(--accent) 34%, transparent); }
 .blob-b { background: color-mix(in srgb, var(--accent-2) 30%, transparent); }
 
@@ -465,17 +504,17 @@ input[type="file"] { border: 1px dashed var(--field-edge); border-radius: 20px; 
     height: 40px;
     min-width: 40px;
     padding: 0;
-    border: 1px solid var(--field-edge);
+    border: 1px solid var(--chip-edge);
     border-radius: 14px;
-    background: var(--field-bg);
-    box-shadow: var(--glass-in);
+    background: var(--chip-bg);
+    box-shadow: var(--chip-shadow);
     color: var(--text);
     font: inherit;
     cursor: pointer;
     transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.25s ease;
 }
 .lang-btn:hover,
-.theme-switch:hover { border-color: var(--accent); background: var(--surface); transform: translateY(-2px); box-shadow: var(--glass-in), 0 8px 18px var(--accent-soft); }
+.theme-switch:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--chip-shadow), 0 8px 18px var(--accent-soft); }
 .lang-btn:active,
 .theme-switch:active { transform: scale(0.93); }
 
@@ -615,13 +654,13 @@ html.refract[data-theme="dark"] .topbar {
         0 8px 32px rgba(17, 17, 26, 0.05);
 }
 html.refract[data-theme="light"] .topbar {
-    --glass-frost: 0.3;
-    background: hsl(0 0% 100% / var(--glass-frost));
+    border-color: rgba(255, 255, 255, 0.95);
+    background: linear-gradient(170deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.5));
     box-shadow:
-        0 0 2px 1px color-mix(in oklch, black, transparent 85%) inset,
-        0 0 10px 4px color-mix(in oklch, black, transparent 90%) inset,
-        0 4px 16px rgba(17, 17, 26, 0.05),
-        0 8px 32px rgba(17, 17, 26, 0.05);
+        inset 0 2px 1px #ffffff,
+        inset 0 -10px 18px -12px rgba(110, 100, 150, 0.3),
+        0 18px 36px -16px rgba(70, 60, 100, 0.35),
+        0 2px 6px rgba(70, 60, 100, 0.08);
 }
 
 @media (max-width: 720px) {
@@ -648,7 +687,7 @@ html.refract[data-theme="light"] .topbar {
    Ikon di menu samping (Daftar invoice, Buat invoice, dst.)
    Gayanya sama dengan ikon globe dan matahari di bar atas: garis tipis berwarna.
    Tiap menu dikenali dari alamat tautannya, jadi file Blade tidak perlu diubah.
-   Warna ikon ada di dua baris --ico-1 sampai --ico-6 di bawah (satu untuk terang, satu untuk gelap).
+   Warna ikon ada di dua baris --ico-1 sampai --ico-7 di bawah (satu untuk terang, satu untuk gelap).
    ========================================================================== */
 .drawer a { display: flex; align-items: center; gap: 12px; }
 .drawer a::before {
@@ -663,8 +702,10 @@ html.refract[data-theme="light"] .topbar {
 }
 .drawer a:hover::before { transform: scale(1.14) rotate(-8deg); }
 
-[data-theme="light"] .drawer { --ico-1: #5b46e6; --ico-2: #0f9d84; --ico-3: #d98a00; --ico-4: #16a34a; --ico-5: #db2777; --ico-6: #0284c7; }
-[data-theme="dark"] .drawer  { --ico-1: #b4a8ff; --ico-2: #5fe6c8; --ico-3: #ffc857; --ico-4: #4ade80; --ico-5: #f9a8d4; --ico-6: #7dd3fc; }
+[data-theme="light"] .drawer { --ico-1: #5b4bd6; --ico-2: #0f9d84; --ico-3: #d98a00; --ico-4: #16a34a; --ico-5: #db2777; --ico-6: #0284c7; --ico-7: #ea580c; }
+[data-theme="dark"] .drawer  { --ico-1: #b4a8ff; --ico-2: #5fe6c8; --ico-3: #ffc857; --ico-4: #4ade80; --ico-5: #f9a8d4; --ico-6: #7dd3fc; --ico-7: #fdba74; }
+/* Laporan: grafik batang. */
+.drawer a[href$="/laporan"] { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 3v16a2 2 0 0 0 2 2h16'/%3E%3Cpath d='M18 17V9'/%3E%3Cpath d='M13 17V5'/%3E%3Cpath d='M8 17v-3'/%3E%3C/svg%3E"); --ico-color: var(--ico-7); }
 
 .drawer a[href$="/invoices"] { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z'/%3E%3Cpath d='M14 2v6h6'/%3E%3Cpath d='M16 13H8'/%3E%3Cpath d='M16 17H8'/%3E%3Cpath d='M10 9H8'/%3E%3C/svg%3E"); --ico-color: var(--ico-1); }
 .drawer a[href$="/invoices/create"] { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 8v8'/%3E%3Cpath d='M8 12h8'/%3E%3C/svg%3E"); --ico-color: var(--ico-2); }
@@ -864,6 +905,7 @@ html.refract[data-theme="light"] .topbar {
     pointer-events: none;
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask-composite: exclude;
 }
 
@@ -903,3 +945,38 @@ body::before {
         var(--orbs-a);
     background-blend-mode: overlay, normal, normal, normal;
 }
+
+/* ==========================================================================
+   NAVBAR KAPSUL: ukuran navbar tetap seperti semula; hanya sorotan pill yang
+   bergeser ke link yang aktif. Pasangan blok "NAVBAR PILL" di app.js.
+   Untuk membatalkan: hapus dari komentar ini sampai akhir file (dan blok itu di app.js).
+   ========================================================================== */
+.nav-links { position: relative; }
+.nav-links a,
+.nav-links a.is-current {
+    position: relative;
+    z-index: 1;          /* di atas pill */
+    border-color: transparent;   /* garis 1px tetap ada (transparan), jadi ukuran link tidak berubah */
+    background: transparent;
+    box-shadow: none;
+    transition: color 0.25s ease, background-color 0.25s ease;
+}
+.nav-links a:hover { background: rgba(90, 80, 120, 0.08); }
+[data-theme="dark"] .nav-links a:hover { background: rgba(255, 255, 255, 0.07); }
+
+.nav-pill {
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    border-radius: 999px;
+    pointer-events: none;
+    opacity: 0;
+    background: var(--chip-bg);
+    border: 1px solid var(--chip-edge);
+    box-shadow: var(--chip-shadow);
+    transition: left 0.45s cubic-bezier(0.22, 1, 0.36, 1), width 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+}
+.nav-pill.on { opacity: 1; }

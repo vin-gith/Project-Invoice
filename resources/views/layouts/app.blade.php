@@ -61,7 +61,7 @@
             <a style="--i:5" href="{{ route('reports.index') }}" class="{{ request()->routeIs('reports.*') ? 'is-current' : '' }}">Laporan</a>
             <a style="--i:6" href="{{ route('business.edit') }}" class="{{ request()->routeIs('business.*') ? 'is-current' : '' }}">Data usaha</a>
             <a style="--i:7" href="{{ route('template.edit') }}" class="{{ request()->routeIs('template.*') ? 'is-current' : '' }}">Template invoice</a>
-            <p class="drawer-foot" translate="no" style="--i:8">{{ \App\Models\BusinessProfile::current()->name }}</p>
+            <p class="drawer-foot" translate="no" style="--i:8">Invoicely</p>
         </nav>
     @endauth
 

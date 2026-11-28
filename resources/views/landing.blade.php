@@ -45,7 +45,6 @@
             <div class="l-wrap hero-center">
                 {{-- intro-*: animasi pembuka (app.css, bagian "Animasi pembuka landing").
                      Judul dipecah per kata (span.w, urutan --w); "tagihan jelas" dibungkus utuh supaya gradasinya tetap. --}}
-                <p class="l-eyebrow intro-eyebrow">Sistem invoice digital</p>
                 <h1 class="intro-title"><span class="w" style="--w:0">Invoice</span> <span class="w" style="--w:1">rapi,</span> <span class="w" style="--w:2"><span class="accent">tagihan jelas</span>,</span> <span class="w" style="--w:3">pembayaran</span> <span class="w" style="--w:4">tercatat.</span></h1>
                 <p class="l-lead intro-lead">
                     Invoicely membantu kamu membuat faktur penjualan, menghitung total tagihan secara otomatis,
@@ -64,7 +63,6 @@
         {{-- ============ Fitur ============ --}}
         <section class="l-section" id="fitur">
             <div class="l-wrap">
-                <p class="l-eyebrow sr">Fitur</p>
                 <h2 class="l-title sr" style="--i:1">Semua yang dibutuhkan untuk menagih pelanggan.</h2>
                 <p class="l-lead sr" style="--i:2">Tidak perlu lagi menghitung manual atau membuat faktur dari awal setiap kali.</p>
 
@@ -106,7 +104,6 @@
         {{-- ============ Cara kerja ============ --}}
         <section class="l-section l-alt" id="cara-kerja">
             <div class="l-wrap">
-                <p class="l-eyebrow sr">Cara kerja</p>
                 <h2 class="l-title sr" style="--i:1">Tiga langkah dari kosong sampai tertagih.</h2>
 
                 <div class="steps-l">
@@ -132,7 +129,6 @@
         {{-- ============ Daftar dan masuk ============ --}}
         <section class="l-section" id="mulai">
             <div class="l-wrap">
-                <p class="l-eyebrow sr">Mulai</p>
                 <h2 class="l-title sr" style="--i:1">Siap membuat invoice pertamamu?</h2>
                 <p class="l-lead sr" style="--i:2">Gratis dicoba. Daftar, isi data pelanggan, dan invoice pertamamu jadi dalam hitungan menit.</p>
 
@@ -162,6 +158,11 @@
     </main>
 
     <script src="{{ asset('js/app.js') }}"></script>
+    {{-- GSAP + ScrollTrigger (versi dikunci, integrity = file tidak bisa diubah diam-diam oleh CDN).
+         Kalau gagal dimuat, landing tetap jalan dengan animasi CSS biasa. --}}
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.1/dist/gsap.min.js" integrity="sha384-3vCAhD+a3BOliP3QqjQINn6ZWiZxoqu0WFxX5ZQZgqekDZuSb1mJBrrLMmu94H8f" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.1/dist/ScrollTrigger.min.js" integrity="sha384-H2WL1iy/jKQQ7MTHU2hskZKNHTYWWD/KgKE1vCNnaWY8An2ESTh23KN/fTp8XS3j" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.27/dist/lenis.min.js" integrity="sha384-R18XzqnxvVLEF+BYfhpmDx30v7eP83fAckyfoRzK7/Uf6nGqufcmsk0eAKo7S3RU" crossorigin="anonymous"></script>
     <script>
         (function () {
             var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -175,6 +176,7 @@
             // Scroll halus saat klik menu (Contoh invoice, Fitur, Cara kerja): mulai pelan, melaju, lalu berhenti pelan.
             // Kalau pengguna menggulung sendiri di tengah jalan, animasi langsung dihentikan.
             function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+            var lenis = null;   // diisi motion() kalau scroll halus Lenis aktif
             document.querySelectorAll('a[href^="#"]').forEach(function (a) {
                 a.addEventListener('click', function (e) {
                     var el = document.querySelector(a.getAttribute('href'));
@@ -185,6 +187,8 @@
                     var end = Math.max(0, el.getBoundingClientRect().top + start - margin);
                     var dist = end - start;
                     var dur = Math.min(1400, Math.max(700, Math.abs(dist) * 0.9));
+                    // Dengan Lenis, Lenis yang menggulung (dan otomatis berhenti kalau pengguna menggulung sendiri).
+                    if (lenis) { lenis.scrollTo(end, { duration: dur / 1000, easing: ease }); return; }
                     var t0 = null, stop = false;
                     function cancel() { stop = true; }
                     window.addEventListener('wheel', cancel, { once: true, passive: true });
@@ -200,9 +204,90 @@
                 });
             });
 
+            // Motion GSAP + ScrollTrigger (blok "MOTION GSAP" di app.css). Kalau GSAP gagal dimuat atau
+            // "kurangi animasi" aktif, bagian ini dilewati dan landing memakai animasi muncul .sr di bawah.
+            var motionOn = !reduce && !!window.gsap && !!window.ScrollTrigger;
+            if (motionOn) { motion(); }
+
+            function motion() {
+                gsap.registerPlugin(ScrollTrigger);
+                document.documentElement.classList.add('gsap-on');
+
+                // Scroll halus Lenis, digerakkan oleh jam GSAP supaya ScrollTrigger membaca posisi yang sama tiap frame.
+                // Hanya roda mouse/touchpad; geser jari di HP tetap scroll bawaan. Kalau Lenis gagal dimuat, scroll biasa.
+                if (window.Lenis) {
+                    lenis = new Lenis();
+                    lenis.on('scroll', ScrollTrigger.update);
+                    gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
+                    gsap.ticker.lagSmoothing(0);
+                }
+
+                var ease = 'power3.out';
+
+                // Hero: isi mundur, mengecil, dan memudar saat di-scroll. scrub = ikut scroll dengan sedikit jeda.
+                gsap.to('.hero-center', {
+                    yPercent: -12, scale: 0.94, opacity: 0, ease: 'none',
+                    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom 15%', scrub: 0.6 }
+                });
+
+                // Judul section: dipecah per kata (span.sw), lalu naik bergantian sekali saat masuk layar.
+                gsap.utils.toArray('.l-title').forEach(function (h) {
+                    var nodes = [], words = [];
+                    h.textContent.trim().split(/\s+/).forEach(function (word, k) {
+                        var s = document.createElement('span');
+                        s.className = 'sw';
+                        s.textContent = word;
+                        if (k) { nodes.push(' '); }
+                        nodes.push(s);
+                        words.push(s);
+                    });
+                    h.classList.remove('sr');
+                    h.replaceChildren.apply(h, nodes);
+                    gsap.from(words, {
+                        yPercent: 70, opacity: 0, duration: 0.8, ease: ease, stagger: 0.06,
+                        scrollTrigger: { trigger: h, start: 'top 85%', once: true }
+                    });
+                });
+
+                // Paragraf dan kartu: naik bergantian per kelompok yang masuk layar bersamaan.
+                // transition dimatikan selama animasi (bentrok dengan GSAP), lalu dibersihkan supaya hover kartu jalan lagi.
+                var items = gsap.utils.toArray('.sr');
+                items.forEach(function (el) { el.classList.remove('sr'); });
+                gsap.set(items, { y: 56, scale: 0.96, opacity: 0, transition: 'none' });
+                ScrollTrigger.batch(items, {
+                    start: 'top 88%',
+                    once: true,
+                    onEnter: function (batch) {
+                        gsap.to(batch, {
+                            y: 0, scale: 1, opacity: 1, duration: 0.9, ease: ease, stagger: 0.12,
+                            clearProps: 'transform,opacity,transition'
+                        });
+                    }
+                });
+
+                // Cara kerja: nomor langkah membesar, lalu garis ke langkah berikutnya terisi, mengikuti scroll.
+                // Selesai saat bagian atasnya di 55% layar, jadi saat menu "Cara kerja" diklik semuanya sudah lengkap.
+                var steps = gsap.utils.toArray('.step-l');
+                if (steps.length) {
+                    gsap.set(steps, { '--fill': 0 });
+                    var tl = gsap.timeline({
+                        scrollTrigger: { trigger: '.steps-l', start: 'top 90%', end: 'top 55%', scrub: 0.6 }
+                    });
+                    steps.forEach(function (s, i) {
+                        tl.from(s.querySelector('.num'), { scale: 0.4, opacity: 0.3, ease: 'back.out(2)', duration: 0.4 });
+                        if (i < steps.length - 1) { tl.to(s, { '--fill': 1, ease: 'none', duration: 0.6 }); }
+                    });
+                }
+
+                // Huruf web selesai dimuat bisa menggeser tinggi halaman: hitung ulang posisi pemicu.
+                if (document.fonts) { document.fonts.ready.then(function () { ScrollTrigger.refresh(); }); }
+            }
+
             // Elemen .sr dan .steps-l muncul (class "in") saat masuk layar.
             var targets = document.querySelectorAll('.sr, .steps-l');
-            if (reduce || !('IntersectionObserver' in window)) {
+            if (motionOn) {
+                // Sudah diatur GSAP.
+            } else if (reduce || !('IntersectionObserver' in window)) {
                 targets.forEach(function (el) { el.classList.add('in'); });
             } else {
                 var io = new IntersectionObserver(function (entries) {

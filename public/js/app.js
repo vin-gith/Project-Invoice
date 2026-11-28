@@ -204,8 +204,7 @@
             var img = document.createElement('img');
             img.alt = 'Pratinjau logo';
             img.src = URL.createObjectURL(f);
-            box.innerHTML = '';
-            box.appendChild(img);
+            box.replaceChildren(img);
         });
     })();
 
@@ -264,7 +263,7 @@
 
         function closeList() {
             list.hidden = true;
-            list.innerHTML = '';
+            list.replaceChildren();
             active = -1;
             input.setAttribute('aria-expanded', 'false');
         }
@@ -277,7 +276,7 @@
         }
 
         function renderList(items) {
-            list.innerHTML = '';
+            list.replaceChildren();
             active = -1;
             if (!items.length) { closeList(); return; }
             items.forEach(function (it) {
@@ -535,6 +534,8 @@
     form.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && step < last && e.target.tagName !== 'TEXTAREA') {
             e.preventDefault();
+            // Enter yang mengonfirmasi ketikan IME (Jepang, Cina, Korea) bukan perintah lanjut. 229 = Safari.
+            if (e.isComposing || e.keyCode === 229) { return; }
             nextBtn.click();
         }
     });
@@ -1077,4 +1078,42 @@
         y = e.clientY;
         if (!queued) { queued = true; requestAnimationFrame(paint); }
     }, { passive: true });
+})();
+
+/* ==========================================================================
+   NAVBAR PILL: sorotan yang bergeser ke link navbar yang aktif (pasangan blok "NAVBAR KAPSUL" di glass.css).
+   Link aktif ditandai class "is-current" oleh pemantau scroll di atas; pill hanya mengikutinya,
+   dan disembunyikan selama belum ada bagian yang aktif (misalnya masih di paling atas halaman).
+   ========================================================================== */
+(function () {
+    'use strict';
+
+    var nav = document.querySelector('.nav-links');
+    if (!nav) { return; }
+
+    var pill = document.createElement('span');
+    pill.className = 'nav-pill';
+    pill.setAttribute('aria-hidden', 'true');
+    nav.insertBefore(pill, nav.firstChild);
+
+    function place() {
+        var link = nav.querySelector('a.is-current');
+        var on = pill.classList.contains('on');
+        if (!link || !link.offsetWidth) { if (on) { pill.classList.remove('on'); } return; }
+        // Muncul pertama kali: langsung di tempatnya, tanpa meluncur dari ujung kiri.
+        if (!on) { pill.style.transition = 'none'; }
+        pill.style.left = link.offsetLeft + 'px';
+        pill.style.width = link.offsetWidth + 'px';
+        if (!on) { void pill.offsetWidth; pill.style.transition = ''; pill.classList.add('on'); }
+    }
+
+    // Hanya perubahan class pada link, bukan pill sendiri: classList selalu memicu observer walau nilainya sama,
+    // jadi kalau pill ikut diamati, place() memanggil dirinya terus dan halaman macet.
+    new MutationObserver(function (records) {
+        for (var i = 0; i < records.length; i++) {
+            if (records[i].target !== pill) { place(); return; }
+        }
+    }).observe(nav, { subtree: true, attributes: true, attributeFilter: ['class'] });
+    window.addEventListener('resize', place);
+    place();
 })();
